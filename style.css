@@ -1,1 +1,65 @@
+body {
+    margin: 0;
+    padding: 0;
+}
 
+header {
+    background-color: blueviolet;
+    height: 40px;
+    text-align: center;
+    font-size: 24px;
+}
+
+header div {
+    display: inline-block;
+    margin: 7px 22px;
+}
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    height: calc(100vh - 100px);
+    width: 100vw;
+
+}
+
+#button {
+    width: 220px;
+    height:  220px;
+    border-radius: 95%;
+    background-image: url(https://pvsz2.ru/statics/plants-big/68.png);
+    background-position: center;
+    background-size: 79%;
+    background-repeat: no-repeat;
+    filter: hue-rotate(10deg);
+    border: 12px solid rgb(170, 233, 0);
+    box-shadow: 0 12px 12px black;
+    cursor: pointer;
+}
+
+#button:active {
+    filter: hue-rotate(45deg);
+    transform: translateY(-1px);
+    
+}
+
+footer {
+    background-color: red;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+}
+
+footer button {
+     background-image: url (https://steamuserimages-a.akamaihd.net/ugc/26235308963966581/DB9B16361F19B407DF5A638F38262AA55BB25F47/);
+    margin-top: 66px;
+    border-radius: 66px;
+}
+
+footer button span 
+    display: block;
+    font-size: 30px;
+}
