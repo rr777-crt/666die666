@@ -1,65 +1,47 @@
 body {
+    font-family: 'Courier New', monospace;
+    background-color: #121212;
+    color: #e0e0e0;
     margin: 0;
-    padding: 0;
+    padding: 20px;
+    line-height: 1.6;
 }
 
-header {
-    background-color: blueviolet;
-    height: 40px;
-    text-align: center;
-    font-size: 24px;
+.game-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-header div {
-    display: inline-block;
-    margin: 7px 22px;
+h1, h2, h3 {
+    color: #d4af37;
 }
 
-main {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    height: calc(100vh - 100px);
-    width: 100vw;
-
-}
-
-#button {
-    width: 220px;
-    height:  220px;
-    border-radius: 95%;
-    background-image: url(https://steamuserimages-a.akamaihd.net/ugc/2058761866733968046/063284B91D984C2C93E7ACC3A76E4C8A39ED1A90/?imw=512&imh=637&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true);
-    background-position: center;
-    background-size: 79%;
-    background-repeat: no-repeat;
-    filter: hue-rotate(10deg);
-    border: 12px solid rgb(170, 233, 0);
-    box-shadow: 0 12px 12px black;
+button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 4px;
     cursor: pointer;
+    font-family: 'Courier New', monospace;
 }
 
-#button:active {
-    filter: hue-rotate(45deg);
-    transform: translateY(-1px);
-    
+button:hover {
+    background-color: #444;
 }
 
-footer {
-    background-color: red;
-    height: 60px;
-    text-align: center;
-    font-size: 24px;
+#inventory {
+    margin-top: 20px;
+    border-top: 1px solid #444;
+    padding-top: 10px;
 }
 
-footer button {
-     background-image: url (https://steamuserimages-a.akamaihd.net/ugc/26235308963966581/DB9B16361F19B407DF5A638F38262AA55BB25F47/);
-    margin-top: 66px;
-    border-radius: 66px;
-}
-
-footer button span 
-    display: block;
-    font-size: 30px;
+#inv-list {
+    list-style-type: none;
+    padding: 0;
 }
