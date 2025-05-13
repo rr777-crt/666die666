@@ -158,3 +158,25 @@ function enableButtons() {
 printText("Частный детектив. Вам дали 24 часа, чтобы раскрыть исчезновение хозяина особняка. Сначала нужно подготовиться.", () => {
     updateInventory();
 });
+
+
+
+
+/* Акт 2: Лес */
+#act2-forest {
+    margin-top: 20px;
+}
+
+#forest-visual {
+    font-size: 20px;
+    letter-spacing: 5px;
+    margin: 10px 0;
+}
+
+#forest-events {
+    min-height: 100px;
+    border: 1px solid #444;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
