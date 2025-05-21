@@ -1,59 +1,243 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тайна старого особняка п(Акт 1)</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Угадай цифру 3.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 10px;
+            touch-action: manipulation;
+        }
+        canvas {
+            border: 2px solid black;
+            margin: 10px auto;
+            display: block;
+            touch-action: none;
+            background: white;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+        #prediction {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px;
+            min-height: 36px;
+        }
+        #counter {
+            color: #666;
+            margin: 10px;
+        }
+        #progress {
+            height: 20px;
+            width: 80%;
+            margin: 10px auto;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            height: 100%;
+            width: 0;
+            background: #4CAF50;
+            transition: width 0.3s;
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>🔍 Тайна старого особняка</h1>
-        <h2>Акт 1: Путь к трупам</h2>
-        <!-- (Всё из Акта 1 остаётся, добавляем скрытый блок для Акта 2) -->
-<div id="act2-forest" style="display: none;">
-    <h2>Акт 2: Тёмный лес</h2>
-    <div id="forest-map">
-        <pre id="forest-visual">🚗🌲🌲🌲🌲🌲🌲🌲🌲🌲🏁</pre>
-        <p>Бензин: <span id="fuel">10</span> км</p>
-    </div>
-    <div id="forest-events"></div>
-</div>
-        
-        <!-- Локация (площадка) -->
-        <div id="location">
-            <pre id="map">
-  [Д] [М]
-   ☻  
-            </pre>
-            <p>Вы на центральной площади. Здесь есть:</p>
-            <ul>
-                <li>☻ — Проживалец</li>
-                <li>[Д] — Ваша машина</li>
-                <li>[М] — Магазин</li>
-            </ul>
-        </div>
-        
-        <!-- Текст (постепенно печатается) -->
-        <div id="text-container">
-            <p id="game-text"></p>
-        </div>
-        
-        <!-- Кнопки действий -->
-        <div id="actions">
-            <button onclick="moveTo('resident')">Подойти к проживальцу</button>
-            <button onclick="moveTo('shop')">Зайти в магазин</button>
-            <button onclick="moveTo('car')">Подойти к машине</button>
-        </div>
-        
-        <!-- Инвентарь -->
-        <div id="inventory">
-            <h3>Инвентарь:</h3>
-            <ul id="inv-list"></ul>
-            <p>Деньги: <span id="money">120</span> монет</p>
-        </div>
-    </div>
+    <h1>Нейросеть угадывает цифры</h1>
+    <p>Рисуйте цифру в любом месте холста ↓</p>
+    <div id="progress"><div id="progress-bar"></div></div>
+    <p id="counter">Попыток: 0/1000</p>
     
-    <script src="game.js"></script>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    
+    <button onclick="clearCanvas()">Очистить</button>
+    <button onclick="predictDigit()">Угадать</button>
+    
+    <div id="prediction">Нарисуйте цифру...</div>
+
+    <script>
+        // Настройка canvas
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let attempts = 0;
+        const MAX_ATTEMPTS = 1000;
+
+        // Очистка холста (белый фон)
+        function initCanvas() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'black';
+        }
+        initCanvas();
+
+        // Рисование (мышь и сенсор)
+        function startDrawing(e) {
+            isDrawing = true;
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 20;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            draw(e);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+
+        // События
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startDrawing(e);
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            draw(e);
+        });
+        canvas.addEventListener('touchend', stopDrawing);
+
+        // Очистка canvas
+        function clearCanvas() {
+            initCanvas();
+            document.getElementById('prediction').innerText = 'Нарисуйте цифру...';
+        }
+
+        // Загрузка модели с прогрессом
+        let model;
+        async function loadModel() {
+            try {
+                const loader = document.getElementById('progress-bar');
+                model = await tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mnist/model.json', {
+                    onProgress: (p) => {
+                        loader.style.width = `${p * 100}%`;
+                    }
+                });
+                loader.style.background = '#4CAF50';
+                console.log("Модель готова!");
+            } catch (e) {
+                document.getElementById('prediction').innerHTML = 
+                    '<span class="warning">Ошибка загрузки модели. Проверьте интернет.</span>';
+                console.error(e);
+            }
+        }
+        loadModel();
+
+        // Предсказание цифры
+        async function predictDigit() {
+            if (attempts >= MAX_ATTEMPTS) {
+                document.getElementById('prediction').innerHTML = 
+                    '<span class="warning">Лимит попыток (1000) исчерпан!</span>';
+                return;
+            }
+
+            if (!model) {
+                alert("Модель ещё загружается...");
+                return;
+            }
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            if (isEmptyCanvas(imageData)) {
+                document.getElementById('prediction').innerText = "Сначала нарисуйте цифру!";
+                return;
+            }
+
+            const tensor = preprocessImage(imageData);
+            const prediction = model.predict(tensor).dataSync();
+            const digit = prediction.indexOf(Math.max(...prediction));
+            
+            document.getElementById('prediction').innerText = `Это цифра: ${digit}!`;
+            attempts++;
+            document.getElementById('counter').innerText = `Попыток: ${attempts}/${MAX_ATTEMPTS}`;
+        }
+
+        // Проверка пустого canvas
+        function isEmptyCanvas(imageData) {
+            const pixels = imageData.data;
+            for (let i = 0; i < pixels.length; i += 4) {
+                if (pixels[i] !== 255) return false; // Найден не белый пиксель
+            }
+            return true;
+        }
+
+        // Обработка изображения (автоматическая обрезка и центрирование)
+        function preprocessImage(imageData) {
+            return tf.tidy(() => {
+                // Конвертируем в тензор и обрезаем пустые края
+                let tensor = tf.browser.fromPixels(imageData, 1)
+                    .toFloat()
+                    .div(255.0);
+                
+                // Инвертируем цвета (MNIST ожидает чёрные цифры на белом фоне)
+                tensor = tf.sub(1.0, tensor);
+                
+                // Находим границы цифры
+                const { top, left, bottom, right } = findBoundingBox(tensor);
+                if (top === -1) return tf.zeros([1, 28, 28, 1]); // Пустое изображение
+                
+                // Обрезаем и масштабируем до 20x20 (с сохранением пропорций)
+                const cropped = tensor.slice([top, left], [bottom - top + 1, right - left + 1]);
+                const resized = tf.image.resizeBilinear(cropped, [20, 20]);
+                
+                // Добавляем отступы до 28x28 (как в MNIST)
+                const padVert = Math.floor((28 - 20) / 2);
+                const padHoriz = Math.ceil((28 - 20) / 2);
+                const padded = resized.pad([[padVert, padVert], [padHoriz, padHoriz], [0, 0]]);
+                
+                return padded.expandDims(0); // Добавляем batch-размерность
+            });
+        }
+
+        // Находим границы цифры на изображении
+        function findBoundingBox(tensor) {
+            const data = tensor.dataSync();
+            const width = tensor.shape[1];
+            let top = -1, left = -1, bottom = -1, right = -1;
+            
+            for (let y = 0; y < tensor.shape[0]; y++) {
+                for (let x = 0; x < width; x++) {
+                    if (data[y * width + x] > 0.1) { // Порог для "не белого"
+                        if (top === -1 || y < top) top = y;
+                        if (left === -1 || x < left) left = x;
+                        if (bottom === -1 || y > bottom) bottom = y;
+                        if (right === -1 || x > right) right = x;
+                    }
+                }
+            }
+            
+            return { top, left, bottom, right };
+        }
+    </script>
 </body>
 </html>
