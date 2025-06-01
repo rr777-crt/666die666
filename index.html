@@ -1,243 +1,1097 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Угадай цифру 3.0</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Крутилка с шансами - МЕГА UPDATE</title>
     <style>
+        :root {
+            --bg-color: #f0f0f0;
+            --container-color: white;
+            --text-color: #333;
+            --button-color: #4CAF50;
+            --button-hover: #45a049;
+            --shop-button: #2196F3;
+            --shop-button-hover: #0b7dda;
+        }
+
+        .dark-mode {
+            --bg-color: #121212;
+            --container-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --button-color: #2E7D32;
+            --button-hover: #1B5E20;
+            --shop-button: #1565C0;
+            --shop-button-hover: #0D47A1;
+        }
+
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 10px;
-            touch-action: manipulation;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+            transition: background-color 0.5s, color 0.5s;
         }
-        canvas {
-            border: 2px solid black;
-            margin: 10px auto;
-            display: block;
-            touch-action: none;
-            background: white;
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--container-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            transition: background-color 0.5s;
         }
-        button {
-            padding: 12px 24px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-            border: none;
-            background: #4CAF50;
-            color: white;
-            border-radius: 5px;
+        
+        h1 {
+            color: var(--text-color);
         }
-        #prediction {
+        
+        .result {
             font-size: 24px;
             font-weight: bold;
-            margin: 15px;
-            min-height: 36px;
+            margin: 20px 0;
+            min-height: 50px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
         }
-        #counter {
+        
+        .normal { color: var(--text-color); }
+        .uncommon { color: green; }
+        .epic { color: blue; }
+        .legendary { color: purple; }
+        .mythic { color: orange; }
+        .shadow { color: gray; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .king { color: gold; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .angel { color: lightblue; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .god { color: red; text-shadow: 0 0 10px gold; font-size: 32px; }
+        .death { color: black; background-color: red; text-shadow: 0 0 10px black; font-size: 32px; }
+        .mega { color: #00bcd4; text-shadow: 0 0 10px #0097a7; font-size: 32px; }
+        .vechno { color: white; background-color: black; font-size: 32px; }
+        .master { color: #ff9800; text-shadow: 0 0 10px #f57c00; font-size: 32px; }
+        .glitch { color: #9b59b6; animation: glitch-anim 0.3s infinite; }
+        .blaster { color: #3498db; text-shadow: 0 0 10px #2980b9; font-size: 32px; }
+        .omega { color: #e74c3c; text-shadow: 0 0 10px #c0392b; font-size: 40px; }
+        
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes blaster-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .spin-btn {
+            background-color: var(--button-color);
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .spin-btn:hover { background-color: var(--button-hover); }
+        .spin-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
+        .cooldown {
+            margin-top: 10px;
+            font-size: 14px;
             color: #666;
-            margin: 10px;
         }
-        #progress {
-            height: 20px;
-            width: 80%;
-            margin: 10px auto;
-            background: #f0f0f0;
-            border-radius: 10px;
-            overflow: hidden;
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
         }
-        #progress-bar {
+        
+        .stat {
+            padding: 10px;
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 5px;
+            margin: 5px;
+        }
+        
+        .shop {
+            margin-top: 30px;
+            text-align: left;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        
+        .shop h2 { text-align: center; }
+        
+        .shop-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: rgba(0,0,0,0.05);
+            border-radius: 5px;
+        }
+        
+        .shop-btn {
+            background-color: var(--shop-button);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .shop-btn:hover { background-color: var(--shop-button-hover); }
+        .shop-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
+        .settings-btn {
+            background-color: #607d8b;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .settings-btn:hover { background-color: #455a64; }
+        
+        .dark-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
-            width: 0;
-            background: #4CAF50;
-            transition: width 0.3s;
+            background-color: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
         }
-        .warning {
-            color: red;
-            font-weight: bold;
+        
+        .gold-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: gold; z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .red-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: red; z-index: 998; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
+        .white-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: white; z-index: 997; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .blue-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #00bcd4; z-index: 996; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
+        
+        .rarity-chances {
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .rarity-chance {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+        
+        .library {
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        
+        .library h2 { text-align: center; }
+        .library-item { padding: 5px 0; text-align: left; }
+        
+        .diamond {
+            font-size: 100px;
+            color: #b9f2ff;
+            text-shadow: 0 0 10px #b9f2ff;
+        }
+        
+        .omega-attack { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
+        .omega-dark-screen { position: absolute; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); transition: opacity 1s; }
+        .omega-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 72px; font-weight: bold; color: #e74c3c; text-shadow: 0 0 20px #c0392b; opacity: 0; }
+        .omega-heart { position: absolute; font-size: 40px; color: red; opacity: 0; transition: opacity 0.5s; }
+        
+        @keyframes omega-rotate {
+            0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+        }
+        
+        @keyframes omega-shake {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(5deg); }
+            75% { transform: translate(-50%, -50%) rotate(-5deg); }
+        }
+        
+        @keyframes diamond-break {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(0.9) rotate(10deg); }
+            50% { transform: scale(0.8) rotate(-10deg); }
+            75% { transform: scale(0.7) rotate(5deg); }
+            100% { transform: scale(0.6) rotate(-5deg); }
+        }
+        
+        .settings-panel {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(0,0,0,0.05);
+            border-radius: 5px;
+        }
+        
+        .settings-panel h3 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
     </style>
 </head>
 <body>
-    <h1>Нейросеть угадывает цифры</h1>
-    <p>Рисуйте цифру в любом месте холста ↓</p>
-    <div id="progress"><div id="progress-bar"></div></div>
-    <p id="counter">Попыток: 0/1000</p>
+    <div class="container">
+        <h1>Крутилка с шансами - МЕГА UPDATE</h1>
+        
+        <button id="settings-btn" class="settings-btn">Настройки</button>
+        <button id="dark-mode-btn" class="settings-btn">Ночной режим</button>
+        
+        <div id="settings-panel" class="settings-panel">
+            <h3>Настройки игры</h3>
+            <div class="toggle-container">
+                <span>Анимация ОМЕГА:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="omega-animation-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">Монеты: <span id="coins">0</span></div>
+            <div class="stat">Всего прокруток: <span id="total-spins">0</span></div>
+        </div>
+        
+        <div class="result" id="result">Нажмите "Крутить"</div>
+        
+        <button class="spin-btn" id="spin-btn">Крутить</button>
+        <div class="cooldown" id="cooldown">Готово к использованию</div>
+        
+        <div class="rarity-chances">
+            <h3>Шансы выпадения:</h3>
+            <div id="chances-list">
+                <div class="rarity-chance"><span>Выпавшие редкости:</span> <span id="discovered-count">0</span></div>
+            </div>
+        </div>
+        
+        <div class="library">
+            <h2>Библиотека</h2>
+            <div id="library-items">
+                <div class="library-item">Пока ничего не найдено...</div>
+            </div>
+        </div>
+        
+        <div class="shop">
+            <h2>Магазин</h2>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Уменьшить перезарядку на 0.5 сек</strong><br>
+                    <small>Текущая перезарядка: <span id="current-cooldown">5</span> сек</small>
+                </div>
+                <button class="shop-btn" id="upgrade-cooldown">25 монет</button>
+            </div>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Убрать "Обычно" из результатов</strong><br>
+                    <small>Увеличивает шансы других редкостей</small>
+                </div>
+                <button class="shop-btn" id="remove-normal">125 монет</button>
+            </div>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Убрать "Необычно" из результатов</strong><br>
+                    <small>Увеличивает шансы других редкостей</small>
+                </div>
+                <button class="shop-btn" id="remove-uncommon">250 монет</button>
+            </div>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Убрать "Эпик" из результатов</strong><br>
+                    <small>Увеличивает шансы других редкостей</small>
+                </div>
+                <button class="shop-btn" id="remove-epic">500 монет</button>
+            </div>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Убрать "Легенду" из результатов</strong><br>
+                    <small>Увеличивает шансы других редкостей</small>
+                </div>
+                <button class="shop-btn" id="remove-legendary">1000 монет</button>
+            </div>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Убрать "Миф" из результатов</strong><br>
+                    <small>Увеличивает шансы других редкостей</small>
+                </div>
+                <button class="shop-btn" id="remove-mythic">2000 монет</button>
+            </div>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Убрать "Ангел" из результатов</strong><br>
+                    <small>Увеличивает шансы других редкостей</small>
+                </div>
+                <button class="shop-btn" id="remove-angel">50000 монет</button>
+            </div>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Убрать "Божество" из результатов</strong><br>
+                    <small>Увеличивает шансы других редкостей</small>
+                </div>
+                <button class="shop-btn" id="remove-god">75000 монет</button>
+            </div>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Убрать "Смерть" из результатов</strong><br>
+                    <small>Увеличивает шансы других редкостей</small>
+                </div>
+                <button class="shop-btn" id="remove-death">100000 монет</button>
+            </div>
+            
+            <div class="shop-item">
+                <div>
+                    <strong>Убрать "МЕГА" из результатов</strong><br>
+                    <small>Увеличивает шансы других редкостей</small>
+                </div>
+                <button class="shop-btn" id="remove-mega">200000 монет</button>
+            </div>
+        </div>
+    </div>
     
-    <canvas id="canvas" width="300" height="300"></canvas>
+    <div class="dark-screen" id="dark-screen">
+        <h1 id="special-text" style="color: white; font-size: 48px;"></h1>
+        <div id="typing-text" class="typing-text"></div>
+        <div id="diamond-container"></div>
+    </div>
     
-    <button onclick="clearCanvas()">Очистить</button>
-    <button onclick="predictDigit()">Угадать</button>
+    <div class="gold-screen" id="gold-screen"></div>
+    <div class="red-screen" id="red-screen"></div>
+    <div class="white-screen" id="white-screen"></div>
+    <div class="blue-screen" id="blue-screen"></div>
     
-    <div id="prediction">Нарисуйте цифру...</div>
-
     <script>
-        // Настройка canvas
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let isDrawing = false;
-        let attempts = 0;
-        const MAX_ATTEMPTS = 1000;
-
-        // Очистка холста (белый фон)
-        function initCanvas() {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'black';
-        }
-        initCanvas();
-
-        // Рисование (мышь и сенсор)
-        function startDrawing(e) {
-            isDrawing = true;
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 20;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            draw(e);
-        }
-
-        function draw(e) {
-            if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-            ctx.beginPath();
-        }
-
-        // События
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            startDrawing(e);
-        });
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            draw(e);
-        });
-        canvas.addEventListener('touchend', stopDrawing);
-
-        // Очистка canvas
-        function clearCanvas() {
-            initCanvas();
-            document.getElementById('prediction').innerText = 'Нарисуйте цифру...';
-        }
-
-        // Загрузка модели с прогрессом
-        let model;
-        async function loadModel() {
-            try {
-                const loader = document.getElementById('progress-bar');
-                model = await tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mnist/model.json', {
-                    onProgress: (p) => {
-                        loader.style.width = `${p * 100}%`;
-                    }
-                });
-                loader.style.background = '#4CAF50';
-                console.log("Модель готова!");
-            } catch (e) {
-                document.getElementById('prediction').innerHTML = 
-                    '<span class="warning">Ошибка загрузки модели. Проверьте интернет.</span>';
-                console.error(e);
-            }
-        }
-        loadModel();
-
-        // Предсказание цифры
-        async function predictDigit() {
-            if (attempts >= MAX_ATTEMPTS) {
-                document.getElementById('prediction').innerHTML = 
-                    '<span class="warning">Лимит попыток (1000) исчерпан!</span>';
-                return;
-            }
-
-            if (!model) {
-                alert("Модель ещё загружается...");
-                return;
-            }
-
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            if (isEmptyCanvas(imageData)) {
-                document.getElementById('prediction').innerText = "Сначала нарисуйте цифру!";
-                return;
-            }
-
-            const tensor = preprocessImage(imageData);
-            const prediction = model.predict(tensor).dataSync();
-            const digit = prediction.indexOf(Math.max(...prediction));
+        // Игровые переменные
+        let coins = 100000;
+        let totalSpins = 0;
+        let cooldownTime = 5000;
+        let isCooldown = false;
+        let removedRarities = {
+            normal: false,
+            uncommon: false,
+            epic: false,
+            legendary: false,
+            mythic: false,
+            angel: false,
+            god: false,
+            death: false,
+            mega: false
+        };
+        let discoveredRarities = {};
+        let library = [];
+        let omegaAnimationEnabled = true;
+        let darkModeEnabled = false;
+        
+        // Шансы выпадения (в процентах)
+        const baseChances = {
+            normal: 33.33,
+            uncommon: 20,
+            epic: 10,
+            legendary: 5,
+            mythic: 2.86,
+            shadow: 2,
+            king: 1,
+            angel: 0.5,
+            god: 0.2,
+            death: 0.06,
+            mega: 0.03,
+            vechno: 0.0067, // ~1/15000
+            master: 0.004,   // ~1/25000
+            heart: 0.015,
+            glitch: 0.025,
+            blaster: 0.01,
+            omega: 0.001
+        };
+        
+        // Награды за каждую редкость (монеты)
+        const rewards = {
+            normal: 1,
+            uncommon: 3,
+            epic: 5,
+            legendary: 10,
+            mythic: 15,
+            shadow: 25,
+            king: 50,
+            angel: 100,
+            god: 500,
+            death: 6666,
+            mega: 10000,
+            vechno: 150000,
+            master: 25000,
+            heart: 6666,
+            glitch: 4040,
+            blaster: 10000,
+            omega: 100000
+        };
+        
+        // Перевод редкостей
+        const translations = {
+            normal: 'Обычно',
+            uncommon: 'Необычно',
+            epic: 'Эпик',
+            legendary: 'Легенда',
+            mythic: 'Миф',
+            shadow: 'Тень',
+            king: 'КОРОЛЬ',
+            angel: 'АНГЕЛ',
+            god: 'БОЖЕСТВО',
+            death: 'СМЕРТЬ',
+            mega: 'М Е Г А',
+            vechno: 'В Е Ч Н О',
+            master: 'М А С Т Е Р',
+            heart: 'С Е Р Д Ц Е',
+            glitch: 'G L I T C H',
+            blaster: 'B L A S T E R',
+            omega: 'О М Е Г А'
+        };
+        
+        // Обновление интерфейса
+        function updateUI() {
+            document.getElementById('coins').textContent = coins;
+            document.getElementById('total-spins').textContent = totalSpins;
+            document.getElementById('current-cooldown').textContent = (cooldownTime / 1000).toFixed(1);
+            document.getElementById('discovered-count').textContent = Object.keys(discoveredRarities).length;
             
-            document.getElementById('prediction').innerText = `Это цифра: ${digit}!`;
-            attempts++;
-            document.getElementById('counter').innerText = `Попыток: ${attempts}/${MAX_ATTEMPTS}`;
-        }
-
-        // Проверка пустого canvas
-        function isEmptyCanvas(imageData) {
-            const pixels = imageData.data;
-            for (let i = 0; i < pixels.length; i += 4) {
-                if (pixels[i] !== 255) return false; // Найден не белый пиксель
-            }
-            return true;
-        }
-
-        // Обработка изображения (автоматическая обрезка и центрирование)
-        function preprocessImage(imageData) {
-            return tf.tidy(() => {
-                // Конвертируем в тензор и обрезаем пустые края
-                let tensor = tf.browser.fromPixels(imageData, 1)
-                    .toFloat()
-                    .div(255.0);
-                
-                // Инвертируем цвета (MNIST ожидает чёрные цифры на белом фоне)
-                tensor = tf.sub(1.0, tensor);
-                
-                // Находим границы цифры
-                const { top, left, bottom, right } = findBoundingBox(tensor);
-                if (top === -1) return tf.zeros([1, 28, 28, 1]); // Пустое изображение
-                
-                // Обрезаем и масштабируем до 20x20 (с сохранением пропорций)
-                const cropped = tensor.slice([top, left], [bottom - top + 1, right - left + 1]);
-                const resized = tf.image.resizeBilinear(cropped, [20, 20]);
-                
-                // Добавляем отступы до 28x28 (как в MNIST)
-                const padVert = Math.floor((28 - 20) / 2);
-                const padHoriz = Math.ceil((28 - 20) / 2);
-                const padded = resized.pad([[padVert, padVert], [padHoriz, padHoriz], [0, 0]]);
-                
-                return padded.expandDims(0); // Добавляем batch-размерность
-            });
-        }
-
-        // Находим границы цифры на изображении
-        function findBoundingBox(tensor) {
-            const data = tensor.dataSync();
-            const width = tensor.shape[1];
-            let top = -1, left = -1, bottom = -1, right = -1;
+            // Обновление кнопок магазина
+            document.getElementById('upgrade-cooldown').disabled = coins < 25;
+            document.getElementById('remove-normal').disabled = coins < 125 || removedRarities.normal;
+            document.getElementById('remove-uncommon').disabled = coins < 250 || removedRarities.uncommon;
+            document.getElementById('remove-epic').disabled = coins < 500 || removedRarities.epic;
+            document.getElementById('remove-legendary').disabled = coins < 1000 || removedRarities.legendary;
+            document.getElementById('remove-mythic').disabled = coins < 2000 || removedRarities.mythic;
+            document.getElementById('remove-angel').disabled = coins < 50000 || removedRarities.angel;
+            document.getElementById('remove-god').disabled = coins < 75000 || removedRarities.god;
+            document.getElementById('remove-death').disabled = coins < 100000 || removedRarities.death;
+            document.getElementById('remove-mega').disabled = coins < 200000 || removedRarities.mega;
             
-            for (let y = 0; y < tensor.shape[0]; y++) {
-                for (let x = 0; x < width; x++) {
-                    if (data[y * width + x] > 0.1) { // Порог для "не белого"
-                        if (top === -1 || y < top) top = y;
-                        if (left === -1 || x < left) left = x;
-                        if (bottom === -1 || y > bottom) bottom = y;
-                        if (right === -1 || x > right) right = x;
-                    }
+            // Обновление текста кнопок для купленных улучшений
+            if (removedRarities.normal) {
+                document.getElementById('remove-normal').textContent = "Куплено";
+                document.getElementById('remove-normal').disabled = true;
+            }
+            if (removedRarities.uncommon) {
+                document.getElementById('remove-uncommon').textContent = "Куплено";
+                document.getElementById('remove-uncommon').disabled = true;
+            }
+            if (removedRarities.epic) {
+                document.getElementById('remove-epic').textContent = "Куплено";
+                document.getElementById('remove-epic').disabled = true;
+            }
+            if (removedRarities.legendary) {
+                document.getElementById('remove-legendary').textContent = "Куплено";
+                document.getElementById('remove-legendary').disabled = true;
+            }
+            if (removedRarities.mythic) {
+                document.getElementById('remove-mythic').textContent = "Куплено";
+                document.getElementById('remove-mythic').disabled = true;
+            }
+            if (removedRarities.angel) {
+                document.getElementById('remove-angel').textContent = "Куплено";
+                document.getElementById('remove-angel').disabled = true;
+            }
+            if (removedRarities.god) {
+                document.getElementById('remove-god').textContent = "Куплено";
+                document.getElementById('remove-god').disabled = true;
+            }
+            if (removedRarities.death) {
+                document.getElementById('remove-death').textContent = "Куплено";
+                document.getElementById('remove-death').disabled = true;
+            }
+            if (removedRarities.mega) {
+                document.getElementById('remove-mega').textContent = "Куплено";
+                document.getElementById('remove-mega').disabled = true;
+            }
+            
+            updateDiscoveredChances();
+        }
+        
+        function updateDiscoveredChances() {
+            const chancesList = document.getElementById('chances-list');
+            // Оставляем только первый элемент (заголовок)
+            while (chancesList.children.length > 1) {
+                chancesList.removeChild(chancesList.lastChild);
+            }
+            
+            // Добавляем только обнаруженные редкости
+            for (const rarity in discoveredRarities) {
+                const chanceElement = document.createElement('div');
+                chanceElement.className = 'rarity-chance ' + rarity + '-chance';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = translations[rarity] + ':';
+                
+                const chanceSpan = document.createElement('span');
+                const chances = calculateAdjustedChances();
+                const total = Object.values(chances).reduce((a, b) => a + b, 0);
+                chanceSpan.textContent = (chances[rarity] / total * 100).toFixed(4) + '%';
+                
+                chanceElement.appendChild(nameSpan);
+                chanceElement.appendChild(chanceSpan);
+                chancesList.appendChild(chanceElement);
+            }
+        }
+        
+        function calculateAdjustedChances() {
+            let chances = {...baseChances};
+            
+            // Удаляем выбранные редкости
+            for (const rarity in removedRarities) {
+                if (removedRarities[rarity]) {
+                    chances[rarity] = 0;
                 }
             }
             
-            return { top, left, bottom, right };
+            return chances;
         }
+        
+        function spin() {
+            if (isCooldown) return;
+            
+            isCooldown = true;
+            totalSpins++;
+            document.getElementById('spin-btn').disabled = true;
+            
+            const chances = calculateAdjustedChances();
+            const totalChance = Object.values(chances).reduce((a, b) => a + b, 0);
+            const random = Math.random() * totalChance;
+            let cumulativeChance = 0;
+            let resultRarity = '';
+            
+            for (const [key, value] of Object.entries(chances)) {
+                cumulativeChance += value;
+                if (random <= cumulativeChance) {
+                    resultRarity = key;
+                    break;
+                }
+            }
+            
+            // Добавляем в обнаруженные
+            if (!discoveredRarities[resultRarity]) {
+                discoveredRarities[resultRarity] = true;
+            }
+            
+            processSpinResult(resultRarity);
+        }
+        
+        function processSpinResult(rarity) {
+            const result = translateRarity(rarity);
+            const resultElement = document.getElementById('result');
+            
+            resultElement.textContent = result;
+            resultElement.className = 'result ' + rarity;
+            
+            coins += rewards[rarity];
+            
+            if (!library.includes(rarity)) {
+                library.push(rarity);
+                updateLibrary();
+            }
+            
+            // Специальные анимации
+            if (rarity === 'god') {
+                showGodAnimation();
+            } else if (rarity === 'death') {
+                showDeathAnimation();
+            } else if (rarity === 'mega') {
+                showMegaAnimation();
+            } else if (rarity === 'vechno') {
+                showVechnoAnimation();
+            } else if (rarity === 'master') {
+                showMasterAnimation();
+            } else if (rarity === 'glitch') {
+                resultElement.classList.add('glitch');
+                setTimeout(() => resultElement.classList.remove('glitch'), 3000);
+            } else if (rarity === 'blaster') {
+                showBlasterAnimation();
+            } else if (rarity === 'omega' && omegaAnimationEnabled) {
+                showOmegaAnimation();
+            }
+            
+            updateUI();
+            startCooldown();
+        }
+        
+        function translateRarity(rarity) {
+            return translations[rarity] || rarity;
+        }
+        
+        function startCooldown() {
+            let remaining = cooldownTime / 1000;
+            document.getElementById('cooldown').textContent = `Перезарядка: ${remaining.toFixed(1)} сек`;
+            
+            const interval = setInterval(() => {
+                remaining -= 0.1;
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    document.getElementById('cooldown').textContent = 'Готово к использованию';
+                    document.getElementById('spin-btn').disabled = false;
+                    isCooldown = false;
+                } else {
+                    document.getElementById('cooldown').textContent = `Перезарядка: ${remaining.toFixed(1)} сек`;
+                }
+            }, 100);
+        }
+        
+        function showGodAnimation() {
+            const darkScreen = document.getElementById('dark-screen');
+            const goldScreen = document.getElementById('gold-screen');
+            const specialText = document.getElementById('special-text');
+            
+            specialText.textContent = translations['god'];
+            specialText.style.color = 'white';
+            
+            darkScreen.style.opacity = '1';
+            darkScreen.style.pointerEvents = 'auto';
+            
+            setTimeout(() => {
+                darkScreen.style.opacity = '0';
+                darkScreen.style.pointerEvents = 'none';
+                goldScreen.style.opacity = '1';
+                
+                setTimeout(() => goldScreen.style.opacity = '0', 3000);
+            }, 1500);
+        }
+        
+        function showDeathAnimation() {
+            const darkScreen = document.getElementById('dark-screen');
+            const redScreen = document.getElementById('red-screen');
+            const specialText = document.getElementById('special-text');
+            const resultElement = document.getElementById('result');
+            
+            specialText.textContent = translations['death'];
+            specialText.style.color = 'white';
+            
+            darkScreen.style.opacity = '1';
+            darkScreen.style.pointerEvents = 'auto';
+            
+            setTimeout(() => {
+                darkScreen.style.opacity = '0';
+                darkScreen.style.pointerEvents = 'none';
+                
+                let blinkCount = 0;
+                const blinkInterval = setInterval(() => {
+                    redScreen.style.opacity = redScreen.style.opacity === '1' ? '0' : '1';
+                    blinkCount++;
+                    
+                    if (blinkCount >= 50) {
+                        clearInterval(blinkInterval);
+                        redScreen.style.opacity = '0';
+                        
+                        const originalSize = resultElement.style.fontSize;
+                        resultElement.style.fontSize = '160px';
+                        
+                        setTimeout(() => resultElement.style.fontSize = originalSize, 1000);
+                    }
+                }, 200);
+            }, 1500);
+        }
+        
+        function showMegaAnimation() {
+            const blueScreen = document.getElementById('blue-screen');
+            let blinkCount = 0;
+            
+            const blinkInterval = setInterval(() => {
+                blueScreen.style.opacity = blueScreen.style.opacity === '1' ? '0' : '1';
+                blinkCount++;
+                
+                if (blinkCount >= 10) {
+                    clearInterval(blinkInterval);
+                    blueScreen.style.opacity = '0';
+                }
+            }, 200); // 10 раз за 2 секунды
+        }
+        
+        function showVechnoAnimation() {
+            const darkScreen = document.getElementById('dark-screen');
+            const whiteScreen = document.getElementById('white-screen');
+            const diamondContainer = document.getElementById('diamond-container');
+            const specialText = document.getElementById('special-text');
+            
+            darkScreen.style.opacity = '1';
+            darkScreen.style.pointerEvents = 'auto';
+            diamondContainer.innerHTML = '<div class="diamond">♦</div>';
+            specialText.textContent = '';
+            
+            // Анимация разрушения алмаза
+            const diamond = diamondContainer.firstChild;
+            let breakCount = 0;
+            const breakInterval = setInterval(() => {
+                diamond.style.animation = 'diamond-break 1s forwards';
+                breakCount++;
+                
+                if (breakCount >= 10) {
+                    clearInterval(breakInterval);
+                    diamondContainer.innerHTML = '';
+                    
+                    // Мигание белым
+                    let blinkCount = 0;
+                    const blinkInterval = setInterval(() => {
+                        whiteScreen.style.opacity = whiteScreen.style.opacity === '1' ? '0' : '1';
+                        blinkCount++;
+                        
+                        if (blinkCount >= 5) {
+                            clearInterval(blinkInterval);
+                            whiteScreen.style.opacity = '0';
+                            darkScreen.style.opacity = '0';
+                            darkScreen.style.pointerEvents = 'none';
+                            
+                            // Показываем результат
+                            specialText.textContent = translations['vechno'];
+                            specialText.style.color = 'white';
+                            setTimeout(() => {
+                                specialText.textContent = '';
+                            }, 3000);
+                        }
+                    }, 300); // 5 раз за 1.5 секунды
+                }
+            }, 1000); // 10 секунд
+        }
+        
+        function showMasterAnimation() {
+            const darkScreen = document.getElementById('dark-screen');
+            const goldScreen = document.getElementById('gold-screen');
+            const specialText = document.getElementById('special-text');
+            
+            specialText.textContent = 'МАСТЕР НА РИНГ';
+            specialText.style.color = 'white';
+            
+            darkScreen.style.opacity = '1';
+            darkScreen.style.pointerEvents = 'auto';
+            
+            setTimeout(() => {
+                darkScreen.style.opacity = '0';
+                darkScreen.style.pointerEvents = 'none';
+                specialText.textContent = '';
+                
+                // Мигание желтым как у божества
+                goldScreen.style.opacity = '1';
+                setTimeout(() => goldScreen.style.opacity = '0', 3000);
+            }, 10000);
+        }
+        
+        function showBlasterAnimation() {
+            const blueScreen = document.getElementById('blue-screen');
+            let blinkCount = 0;
+            
+            const blinkInterval = setInterval(() => {
+                blueScreen.style.opacity = blueScreen.style.opacity === '1' ? '0' : '1';
+                blinkCount++;
+                
+                if (blinkCount >= 10) {
+                    clearInterval(blinkInterval);
+                    blueScreen.style.opacity = '0';
+                }
+            }, 500); // 10 раз за 5 секунд
+        }
+        
+        function showOmegaAnimation() {
+            const omegaAttack = document.createElement('div');
+            omegaAttack.className = 'omega-attack';
+            
+            const darkScreen = document.createElement('div');
+            darkScreen.className = 'omega-dark-screen';
+            darkScreen.style.opacity = '0';
+            
+            const omegaText = document.createElement('div');
+            omegaText.className = 'omega-text';
+            omegaText.textContent = translations['omega'];
+            
+            const heartsContainer = document.createElement('div');
+            heartsContainer.className = 'omega-hearts-container';
+            
+            omegaAttack.appendChild(darkScreen);
+            omegaAttack.appendChild(omegaText);
+            omegaAttack.appendChild(heartsContainer);
+            document.body.appendChild(omegaAttack);
+            
+            setTimeout(() => {
+                darkScreen.style.opacity = '1';
+                
+                // Создаем сердца, которые вращаются вокруг текста ОМЕГА
+                for (let i = 0; i < 7; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.className = 'omega-heart';
+                        heart.innerHTML = '❤';
+                        heart.style.opacity = '1';
+                        heart.style.animation = `omega-rotate ${5 + i}s linear infinite`;
+                        heart.style.animationDelay = `${i * 0.2}s`;
+                        heartsContainer.appendChild(heart);
+                    }, 2000 * (i + 1));
+                }
+                
+                setTimeout(() => {
+                    heartsContainer.innerHTML = '';
+                    omegaText.style.opacity = '1';
+                    omegaText.style.animation = 'omega-shake 0.1s infinite';
+                    
+                    setTimeout(() => {
+                        omegaText.style.animation = 'none';
+                        setTimeout(() => omegaAttack.remove(), 1000);
+                    }, 10000);
+                }, 16000);
+            }, 0);
+        }
+        
+        function updateLibrary() {
+            const libraryElement = document.getElementById('library-items');
+            
+            if (library.length === 0) {
+                libraryElement.innerHTML = '<div class="library-item">Пока ничего не найдено...</div>';
+                return;
+            }
+            
+            libraryElement.innerHTML = '';
+            library.sort().forEach(rarity => {
+                const item = document.createElement('div');
+                item.className = 'library-item';
+                item.textContent = `${translateRarity(rarity)} (${rewards[rarity]} монет)`;
+                item.style.color = getRarityColor(rarity);
+                
+                // Выделяем особо редкие предметы
+                if (['god', 'death', 'mega', 'vechno', 'master', 'omega'].includes(rarity)) {
+                    item.style.fontWeight = 'bold';
+                }
+                
+                libraryElement.appendChild(item);
+            });
+        }
+        
+        function getRarityColor(rarity) {
+            const colors = {
+                normal: 'black',
+                uncommon: 'green',
+                epic: 'blue',
+                legendary: 'purple',
+                mythic: 'orange',
+                shadow: 'gray',
+                king: 'gold',
+                angel: 'lightblue',
+                god: 'red',
+                death: 'black',
+                mega: '#00bcd4',
+                vechno: 'white',
+                master: '#ff9800',
+                heart: 'darkred',
+                glitch: '#9b59b6',
+                blaster: '#3498db',
+                omega: '#e74c3c'
+            };
+            return colors[rarity] || 'black';
+        }
+        
+        function setupShop() {
+            document.getElementById('upgrade-cooldown').addEventListener('click', () => {
+                if (coins >= 25) {
+                    coins -= 25;
+                    cooldownTime -= 500;
+                    updateUI();
+                }
+            });
+            
+            document.getElementById('remove-normal').addEventListener('click', () => {
+                if (coins >= 125 && !removedRarities.normal) {
+                    coins -= 125;
+                    removedRarities.normal = true;
+                    updateUI();
+                }
+            });
+            
+            document.getElementById('remove-uncommon').addEventListener('click', () => {
+                if (coins >= 250 && !removedRarities.uncommon) {
+                    coins -= 250;
+                    removedRarities.uncommon = true;
+                    updateUI();
+                }
+            });
+            
+            document.getElementById('remove-epic').addEventListener('click', () => {
+                if (coins >= 500 && !removedRarities.epic) {
+                    coins -= 500;
+                    removedRarities.epic = true;
+                    updateUI();
+                }
+            });
+            
+            document.getElementById('remove-legendary').addEventListener('click', () => {
+                if (coins >= 1000 && !removedRarities.legendary) {
+                    coins -= 1000;
+                    removedRarities.legendary = true;
+                    updateUI();
+                }
+            });
+            
+            document.getElementById('remove-mythic').addEventListener('click', () => {
+                if (coins >= 2000 && !removedRarities.mythic) {
+                    coins -= 2000;
+                    removedRarities.mythic = true;
+                    updateUI();
+                }
+            });
+            
+            document.getElementById('remove-angel').addEventListener('click', () => {
+                if (coins >= 50000 && !removedRarities.angel) {
+                    coins -= 50000;
+                    removedRarities.angel = true;
+                    updateUI();
+                }
+            });
+            
+            document.getElementById('remove-god').addEventListener('click', () => {
+                if (coins >= 75000 && !removedRarities.god) {
+                    coins -= 75000;
+                    removedRarities.god = true;
+                    updateUI();
+                }
+            });
+            
+            document.getElementById('remove-death').addEventListener('click', () => {
+                if (coins >= 100000 && !removedRarities.death) {
+                    coins -= 100000;
+                    removedRarities.death = true;
+                    updateUI();
+                }
+            });
+            
+            document.getElementById('remove-mega').addEventListener('click', () => {
+                if (coins >= 200000 && !removedRarities.mega) {
+                    coins -= 200000;
+                    removedRarities.mega = true;
+                    updateUI();
+                }
+            });
+        }
+        
+        function setupSettings() {
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsPanel = document.getElementById('settings-panel');
+            const darkModeBtn = document.getElementById('dark-mode-btn');
+            const omegaAnimationToggle = document.getElementById('omega-animation-toggle');
+            
+            settingsBtn.addEventListener('click', () => {
+                settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            darkModeBtn.addEventListener('click', () => {
+                darkModeEnabled = !darkModeEnabled;
+                if (darkModeEnabled) {
+                    document.body.classList.add('dark-mode');
+                    darkModeBtn.textContent = 'Дневной режим';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    darkModeBtn.textContent = 'Ночной режим';
+                }
+            });
+            
+            omegaAnimationToggle.addEventListener('change', (e) => {
+                omegaAnimationEnabled = e.target.checked;
+            });
+        }
+        
+        function init() {
+            document.getElementById('spin-btn').addEventListener('click', spin);
+            setupShop();
+            setupSettings();
+            updateUI();
+        }
+        
+        window.onload = init;
     </script>
 </body>
 </html>
