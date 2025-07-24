@@ -3,1095 +3,829 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Крутилка с шансами - МЕГА UPDATE</title>
+    <title>Карточная Игра</title>
     <style>
-        :root {
-            --bg-color: #f0f0f0;
-            --container-color: white;
-            --text-color: #333;
-            --button-color: #4CAF50;
-            --button-hover: #45a049;
-            --shop-button: #2196F3;
-            --shop-button-hover: #0b7dda;
-        }
-
-        .dark-mode {
-            --bg-color: #121212;
-            --container-color: #1e1e1e;
-            --text-color: #e0e0e0;
-            --button-color: #2E7D32;
-            --button-hover: #1B5E20;
-            --shop-button: #1565C0;
-            --shop-button-hover: #0D47A1;
-        }
-
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-color);
-            transition: background-color 0.5s, color 0.5s;
-        }
-        
-        .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
-            background-color: var(--container-color);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            transition: background-color 0.5s;
-        }
-        
-        h1 {
-            color: var(--text-color);
-        }
-        
-        .result {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 20px 0;
-            min-height: 50px;
             padding: 10px;
-            border-radius: 5px;
-            transition: all 0.3s;
+            background-color: #f5f5f5;
+            color: #333;
         }
         
-        .normal { color: var(--text-color); }
-        .uncommon { color: green; }
-        .epic { color: blue; }
-        .legendary { color: purple; }
-        .mythic { color: orange; }
-        .shadow { color: gray; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
-        .king { color: gold; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
-        .angel { color: lightblue; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
-        .god { color: red; text-shadow: 0 0 10px gold; font-size: 32px; }
-        .death { color: black; background-color: red; text-shadow: 0 0 10px black; font-size: 32px; }
-        .mega { color: #00bcd4; text-shadow: 0 0 10px #0097a7; font-size: 32px; }
-        .vechno { color: white; background-color: black; font-size: 32px; }
-        .master { color: #ff9800; text-shadow: 0 0 10px #f57c00; font-size: 32px; }
-        .glitch { color: #9b59b6; animation: glitch-anim 0.3s infinite; }
-        .blaster { color: #3498db; text-shadow: 0 0 10px #2980b9; font-size: 32px; }
-        .omega { color: #e74c3c; text-shadow: 0 0 10px #c0392b; font-size: 40px; }
-        
-        @keyframes glitch-anim {
-            0% { transform: translate(0); }
-            20% { transform: translate(-3px, 3px); }
-            40% { transform: translate(-3px, -3px); }
-            60% { transform: translate(3px, 3px); }
-            80% { transform: translate(3px, -3px); }
-            100% { transform: translate(0); }
-        }
-        
-        @keyframes blaster-blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-        
-        .spin-btn {
-            background-color: var(--button-color);
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 10px 2px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        
-        .spin-btn:hover { background-color: var(--button-hover); }
-        .spin-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
-        
-        .cooldown {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #666;
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         
         .stats {
             display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
+            justify-content: space-between;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 16px;
+        }
+        
+        .blocks {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
         
-        .stat {
-            padding: 10px;
-            background-color: rgba(0,0,0,0.1);
+        .block {
+            width: 100px;
+            height: 100px;
+            background-color: #ddd;
             border-radius: 5px;
-            margin: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
         
-        .shop {
-            margin-top: 30px;
-            text-align: left;
-            border-top: 1px solid #ddd;
-            padding-top: 20px;
+        .card {
+            width: 90%;
+            height: 90%;
+            background-color: white;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 14px;
         }
         
-        .shop h2 { text-align: center; }
+        .card.common {
+            border: 2px solid #ccc;
+            color: #333;
+        }
         
-        .shop-item {
+        .card.rare {
+            border: 2px solid #4da6ff;
+            background-color: #e6f2ff;
+            color: #003366;
+        }
+        
+        .card.epic {
+            border: 2px solid #b366ff;
+            background-color: #f0e6ff;
+            color: #4d0066;
+        }
+        
+        .card.legendary {
+            border: 2px solid #ff9900;
+            background-color: #fff2cc;
+            color: #663300;
+        }
+        
+        .card.divine {
+            background: linear-gradient(45deg, #ff0000, #ff9900, #33cc33, #0099ff, #9933ff);
+            background-size: 400% 400%;
+            animation: rainbow 5s ease infinite;
+            border: 2px solid gold;
+            color: white;
+            text-shadow: 0 0 3px black;
+        }
+        
+        @keyframes rainbow {
+            0% {background-position: 0% 50%}
+            50% {background-position: 100% 50%}
+            100% {background-position: 0% 50%}
+        }
+        
+        .pack-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 14px;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .inventory {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .inventory-title {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            margin: 5px 0;
-            background-color: rgba(0,0,0,0.05);
-            border-radius: 5px;
+            margin-bottom: 5px;
+            font-size: 16px;
         }
         
-        .shop-btn {
-            background-color: var(--shop-button);
-            border: none;
-            color: white;
-            padding: 8px 16px;
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 5px;
+        }
+        
+        .inventory-card {
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 12px;
             text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
             cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+            word-break: break-word;
+            position: relative;
+            transition: all 0.2s;
+            user-select: none;
         }
         
-        .shop-btn:hover { background-color: var(--shop-button-hover); }
-        .shop-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
-        
-        .settings-btn {
-            background-color: #607d8b;
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin: 5px;
-            transition: background-color 0.3s;
+        .inventory-card.selected {
+            border: 2px solid green;
         }
         
-        .settings-btn:hover { background-color: #455a64; }
+        .inventory-card.selling {
+            transform: scale(0.95);
+            opacity: 0.8;
+            border: 2px dashed red;
+        }
         
-        .dark-screen {
+        .hold-timer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background-color: #ff5722;
+            transition: width 1s linear;
+        }
+        
+        .upgrades {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .pack-opening {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.9);
+            background-color: rgba(0,0,0,0.8);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s;
+            z-index: 100;
+            color: white;
         }
         
-        .gold-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: gold; z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .red-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: red; z-index: 998; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
-        .white-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: white; z-index: 997; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .blue-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #00bcd4; z-index: 996; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
-        
-        .rarity-chances {
-            margin-top: 20px;
-            text-align: left;
-        }
-        
-        .rarity-chance {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-        }
-        
-        .library {
-            margin-top: 30px;
-            border-top: 1px solid #ddd;
-            padding-top: 20px;
-        }
-        
-        .library h2 { text-align: center; }
-        .library-item { padding: 5px 0; text-align: left; }
-        
-        .diamond {
-            font-size: 100px;
-            color: #b9f2ff;
-            text-shadow: 0 0 10px #b9f2ff;
-        }
-        
-        .omega-attack { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
-        .omega-dark-screen { position: absolute; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); transition: opacity 1s; }
-        .omega-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 72px; font-weight: bold; color: #e74c3c; text-shadow: 0 0 20px #c0392b; opacity: 0; }
-        .omega-heart { position: absolute; font-size: 40px; color: red; opacity: 0; transition: opacity 0.5s; }
-        
-        @keyframes omega-rotate {
-            0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
-            100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
-        }
-        
-        @keyframes omega-shake {
-            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-            25% { transform: translate(-50%, -50%) rotate(5deg); }
-            75% { transform: translate(-50%, -50%) rotate(-5deg); }
-        }
-        
-        @keyframes diamond-break {
-            0% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(0.9) rotate(10deg); }
-            50% { transform: scale(0.8) rotate(-10deg); }
-            75% { transform: scale(0.7) rotate(5deg); }
-            100% { transform: scale(0.6) rotate(-5deg); }
-        }
-        
-        .settings-panel {
-            display: none;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: rgba(0,0,0,0.05);
-            border-radius: 5px;
-        }
-        
-        .settings-panel h3 {
-            margin-top: 0;
-            text-align: center;
-        }
-        
-        .toggle-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 10px 0;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
+        .pack-card {
+            width: 70%;
+            max-width: 300px;
+            height: 200px;
             background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            transform: scale(0);
+            animation: cardReveal 0.5s forwards;
+            color: #333;
         }
         
-        input:checked + .slider {
-            background-color: #2196F3;
+        @keyframes cardReveal {
+            to { transform: scale(1); }
         }
         
-        input:checked + .slider:before {
-            transform: translateX(26px);
+        .pack-info {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .continue-btn {
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .placed-card {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Крутилка с шансами - МЕГА UPDATE</h1>
-        
-        <button id="settings-btn" class="settings-btn">Настройки</button>
-        <button id="dark-mode-btn" class="settings-btn">Ночной режим</button>
-        
-        <div id="settings-panel" class="settings-panel">
-            <h3>Настройки игры</h3>
-            <div class="toggle-container">
-                <span>Анимация ОМЕГА:</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="omega-animation-toggle" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-        
+    <div class="game-container">
         <div class="stats">
-            <div class="stat">Монеты: <span id="coins">0</span></div>
-            <div class="stat">Всего прокруток: <span id="total-spins">0</span></div>
+            <div>Монеты: <span id="money">15</span>¢</div>
+            <div>Карты: <span id="total-cards">0</span>/<span id="max-cards">15</span></div>
         </div>
         
-        <div class="result" id="result">Нажмите "Крутить"</div>
-        
-        <button class="spin-btn" id="spin-btn">Крутить</button>
-        <div class="cooldown" id="cooldown">Готово к использованию</div>
-        
-        <div class="rarity-chances">
-            <h3>Шансы выпадения:</h3>
-            <div id="chances-list">
-                <div class="rarity-chance"><span>Выпавшие редкости:</span> <span id="discovered-count">0</span></div>
-            </div>
+        <div class="blocks" id="blocks">
+            <!-- Блоки будут добавлены динамически -->
         </div>
         
-        <div class="library">
-            <h2>Библиотека</h2>
-            <div id="library-items">
-                <div class="library-item">Пока ничего не найдено...</div>
-            </div>
+        <div class="pack-buttons">
+            <button id="small-pack" onclick="buyPack('small')">Маленькая пачка (5¢)</button>
+            <button id="big-pack" onclick="buyPack('big')">Большая пачка (50¢)</button>
+            <button id="premium-pack" onclick="buyPack('premium')">Премиум пачка (500¢)</button>
         </div>
         
-        <div class="shop">
-            <h2>Магазин</h2>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Уменьшить перезарядку на 0.5 сек</strong><br>
-                    <small>Текущая перезарядка: <span id="current-cooldown">5</span> сек</small>
-                </div>
-                <button class="shop-btn" id="upgrade-cooldown">25 монет</button>
+        <div class="upgrades">
+            <button onclick="buyBlock()">+1 блок (<span id="block-price">25</span>¢)</button>
+            <button onclick="buyCardSlot()">+1 слот (<span id="slot-price">5</span>¢)</button>
+        </div>
+        
+        <div class="inventory">
+            <div class="inventory-title">
+                <span>Инвентарь</span>
+                <span id="selected-card-name"></span>
             </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Убрать "Обычно" из результатов</strong><br>
-                    <small>Увеличивает шансы других редкостей</small>
-                </div>
-                <button class="shop-btn" id="remove-normal">125 монет</button>
-            </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Убрать "Необычно" из результатов</strong><br>
-                    <small>Увеличивает шансы других редкостей</small>
-                </div>
-                <button class="shop-btn" id="remove-uncommon">250 монет</button>
-            </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Убрать "Эпик" из результатов</strong><br>
-                    <small>Увеличивает шансы других редкостей</small>
-                </div>
-                <button class="shop-btn" id="remove-epic">500 монет</button>
-            </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Убрать "Легенду" из результатов</strong><br>
-                    <small>Увеличивает шансы других редкостей</small>
-                </div>
-                <button class="shop-btn" id="remove-legendary">1000 монет</button>
-            </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Убрать "Миф" из результатов</strong><br>
-                    <small>Увеличивает шансы других редкостей</small>
-                </div>
-                <button class="shop-btn" id="remove-mythic">2000 монет</button>
-            </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Убрать "Ангел" из результатов</strong><br>
-                    <small>Увеличивает шансы других редкостей</small>
-                </div>
-                <button class="shop-btn" id="remove-angel">50000 монет</button>
-            </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Убрать "Божество" из результатов</strong><br>
-                    <small>Увеличивает шансы других редкостей</small>
-                </div>
-                <button class="shop-btn" id="remove-god">75000 монет</button>
-            </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Убрать "Смерть" из результатов</strong><br>
-                    <small>Увеличивает шансы других редкостей</small>
-                </div>
-                <button class="shop-btn" id="remove-death">100000 монет</button>
-            </div>
-            
-            <div class="shop-item">
-                <div>
-                    <strong>Убрать "МЕГА" из результатов</strong><br>
-                    <small>Увеличивает шансы других редкостей</small>
-                </div>
-                <button class="shop-btn" id="remove-mega">200000 монет</button>
+            <div class="cards-grid" id="inventory">
+                <!-- Карты будут добавлены динамически -->
             </div>
         </div>
     </div>
     
-    <div class="dark-screen" id="dark-screen">
-        <h1 id="special-text" style="color: white; font-size: 48px;"></h1>
-        <div id="typing-text" class="typing-text"></div>
-        <div id="diamond-container"></div>
+    <div class="pack-opening" id="pack-opening" style="display: none;">
+        <div class="pack-info" id="pack-info">Открываете маленькую пачку (осталось: 4 карт)</div>
+        <div class="pack-card" id="pack-card">
+            <!-- Карта будет добавлена динамически -->
+        </div>
+        <div class="continue-btn" onclick="continueOpening()">Продолжить</div>
     </div>
-    
-    <div class="gold-screen" id="gold-screen"></div>
-    <div class="red-screen" id="red-screen"></div>
-    <div class="white-screen" id="white-screen"></div>
-    <div class="blue-screen" id="blue-screen"></div>
     
     <script>
-        // Игровые переменные
-        let coins = 100000;
-        let totalSpins = 0;
-        let cooldownTime = 5000;
-        let isCooldown = false;
-        let removedRarities = {
-            normal: false,
-            uncommon: false,
-            epic: false,
-            legendary: false,
-            mythic: false,
-            angel: false,
-            god: false,
-            death: false,
-            mega: false
+        // Игровые данные
+        let gameState = {
+            money: 15,
+            cards: [],
+            placedCards: [],
+            blocks: 3,
+            maxCards: 15,
+            blockPrice: 25,
+            slotPrice: 5,
+            lastPlayTime: Date.now()
         };
-        let discoveredRarities = {};
-        let library = [];
-        let omegaAnimationEnabled = true;
-        let darkModeEnabled = false;
         
-        // Шансы выпадения (в процентах)
-        const baseChances = {
-            normal: 33.33,
-            uncommon: 20,
+        let selectedCard = null;
+        let currentPack = null;
+        let cardsToOpen = 0;
+        let cardsOpened = 0;
+        let holdTimers = {};
+        let tapStartTime = 0;
+        let isSelling = false;
+
+        // Цены продажи карт
+        const sellPrices = {
+            common: 1,
+            rare: 3,
             epic: 10,
-            legendary: 5,
-            mythic: 2.86,
-            shadow: 2,
-            king: 1,
-            angel: 0.5,
-            god: 0.2,
-            death: 0.06,
-            mega: 0.03,
-            vechno: 0.0067, // ~1/15000
-            master: 0.004,   // ~1/25000
-            heart: 0.015,
-            glitch: 0.025,
-            blaster: 0.01,
-            omega: 100
+            legendary: 40,
+            divine: 400
         };
         
-        // Награды за каждую редкость (монеты)
-        const rewards = {
-            normal: 1,
-            uncommon: 3,
-            epic: 5,
-            legendary: 10,
-            mythic: 15,
-            shadow: 25,
-            king: 50,
-            angel: 100,
-            god: 500,
-            death: 6666,
-            mega: 10000,
-            vechno: 150000,
-            master: 25000,
-            heart: 6666,
-            glitch: 4040,
-            blaster: 10000,
-            omega: 100000
+        // Карточные пачки
+        const packs = {
+            small: {
+                price: 5,
+                size: { min: 4, max: 6 },
+                cards: [
+                    { name: "Blockman Go!", chance: 50, rarity: "common", income: 0.01 },
+                    { name: "Soul Knight", chance: 35, rarity: "common", income: 0.03 },
+                    { name: "Baldi's Basic Classics", chance: 10.5, rarity: "rare", income: 0.07 },
+                    { name: "Roblox", chance: 4, rarity: "rare", income: 0.1 },
+                    { name: "Cookie Clicker", chance: 0.5, rarity: "epic", income: 0.8 }
+                ]
+            },
+            big: {
+                price: 50,
+                size: { min: 4, max: 6 },
+                cards: [
+                    { name: "Baldi's Basic Classics", chance: 40, rarity: "rare", income: 0.07 },
+                    { name: "Roblox", chance: 30, rarity: "rare", income: 0.1 },
+                    { name: "Dead Cells", chance: 20, rarity: "rare", income: 0.3 },
+                    { name: "Cookie Clicker", chance: 9, rarity: "epic", income: 0.8 },
+                    { name: "Bandi", chance: 1, rarity: "epic", income: 1.2 }
+                ]
+            },
+            premium: {
+                price: 500,
+                size: { min: 4, max: 6 },
+                cards: [
+                    { name: "Bandi", chance: 50, rarity: "epic", income: 1.2 },
+                    { name: "Terraria", chance: 30, rarity: "epic", income: 2 },
+                    { name: "FL Studio", chance: 17, rarity: "epic", income: 2.5 },
+                    { name: "ULTRAKILL", chance: 2.55, rarity: "legendary", income: 3.25 },
+                    { name: "GitHub", chance: 0.5, rarity: "legendary", income: 5 },
+                    { name: "MINECRAFT", chance: 0.05, rarity: "divine", income: 100 }
+                ]
+            }
         };
         
-        // Перевод редкостей
-        const translations = {
-            normal: 'Обычно',
-            uncommon: 'Необычно',
-            epic: 'Эпик',
-            legendary: 'Легенда',
-            mythic: 'Миф',
-            shadow: 'Тень',
-            king: 'КОРОЛЬ',
-            angel: 'АНГЕЛ',
-            god: 'БОЖЕСТВО',
-            death: 'СМЕРТЬ',
-            mega: 'М Е Г А',
-            vechno: 'В Е Ч Н О',
-            master: 'М А С Т Е Р',
-            heart: 'С Е Р Д Ц Е',
-            glitch: 'G L I T C H',
-            blaster: 'B L A S T E R',
-            omega: 'О М Е Г А'
-        };
+        // Инициализация игры
+        function initGame() {
+            loadGame();
+            updateUI();
+            renderBlocks();
+            renderInventory();
+            
+            // Запуск пассивного дохода
+            setInterval(passiveIncome, 1000);
+            
+            // Автосохранение каждые 30 секунд
+            setInterval(saveGame, 30000);
+            
+            // Сохраняем при закрытии вкладки
+            window.addEventListener('beforeunload', saveGame);
+        }
+        
+        // Сохранение игры
+        function saveGame() {
+            gameState.lastPlayTime = Date.now();
+            localStorage.setItem('cardGameSave', JSON.stringify(gameState));
+        }
+        
+        // Загрузка игры
+        function loadGame() {
+            const saved = localStorage.getItem('cardGameSave');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                
+                // Рассчитываем офлайн-доход
+                const now = Date.now();
+                const offlineTime = now - parsed.lastPlayTime;
+                const offlineSeconds = Math.floor(offlineTime / 1000);
+                
+                if (offlineSeconds > 0 && parsed.placedCards.length > 0) {
+                    let offlineIncome = 0;
+                    parsed.placedCards.forEach(card => {
+                        if (card) offlineIncome += card.income * offlineSeconds;
+                    });
+                    
+                    if (offlineIncome > 0) {
+                        parsed.money += offlineIncome;
+                        alert(`Вы получили ${offlineIncome.toFixed(2)}¢ за ${formatTime(offlineSeconds)} отсутствия!`);
+                    }
+                }
+                
+                gameState = parsed;
+            }
+        }
+        
+        // Форматирование времени
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            return [
+                hours > 0 ? `${hours}ч` : '',
+                minutes > 0 ? `${minutes}м` : '',
+                `${secs}с`
+            ].filter(Boolean).join(' ');
+        }
         
         // Обновление интерфейса
         function updateUI() {
-            document.getElementById('coins').textContent = coins;
-            document.getElementById('total-spins').textContent = totalSpins;
-            document.getElementById('current-cooldown').textContent = (cooldownTime / 1000).toFixed(1);
-            document.getElementById('discovered-count').textContent = Object.keys(discoveredRarities).length;
+            document.getElementById('money').textContent = gameState.money.toFixed(2);
+            document.getElementById('total-cards').textContent = gameState.cards.length;
+            document.getElementById('max-cards').textContent = gameState.maxCards;
+            document.getElementById('block-price').textContent = gameState.blockPrice;
+            document.getElementById('slot-price').textContent = gameState.slotPrice;
             
-            // Обновление кнопок магазина
-            document.getElementById('upgrade-cooldown').disabled = coins < 25;
-            document.getElementById('remove-normal').disabled = coins < 125 || removedRarities.normal;
-            document.getElementById('remove-uncommon').disabled = coins < 250 || removedRarities.uncommon;
-            document.getElementById('remove-epic').disabled = coins < 500 || removedRarities.epic;
-            document.getElementById('remove-legendary').disabled = coins < 1000 || removedRarities.legendary;
-            document.getElementById('remove-mythic').disabled = coins < 2000 || removedRarities.mythic;
-            document.getElementById('remove-angel').disabled = coins < 50000 || removedRarities.angel;
-            document.getElementById('remove-god').disabled = coins < 75000 || removedRarities.god;
-            document.getElementById('remove-death').disabled = coins < 100000 || removedRarities.death;
-            document.getElementById('remove-mega').disabled = coins < 200000 || removedRarities.mega;
-            
-            // Обновление текста кнопок для купленных улучшений
-            if (removedRarities.normal) {
-                document.getElementById('remove-normal').textContent = "Куплено";
-                document.getElementById('remove-normal').disabled = true;
-            }
-            if (removedRarities.uncommon) {
-                document.getElementById('remove-uncommon').textContent = "Куплено";
-                document.getElementById('remove-uncommon').disabled = true;
-            }
-            if (removedRarities.epic) {
-                document.getElementById('remove-epic').textContent = "Куплено";
-                document.getElementById('remove-epic').disabled = true;
-            }
-            if (removedRarities.legendary) {
-                document.getElementById('remove-legendary').textContent = "Куплено";
-                document.getElementById('remove-legendary').disabled = true;
-            }
-            if (removedRarities.mythic) {
-                document.getElementById('remove-mythic').textContent = "Куплено";
-                document.getElementById('remove-mythic').disabled = true;
-            }
-            if (removedRarities.angel) {
-                document.getElementById('remove-angel').textContent = "Куплено";
-                document.getElementById('remove-angel').disabled = true;
-            }
-            if (removedRarities.god) {
-                document.getElementById('remove-god').textContent = "Куплено";
-                document.getElementById('remove-god').disabled = true;
-            }
-            if (removedRarities.death) {
-                document.getElementById('remove-death').textContent = "Куплено";
-                document.getElementById('remove-death').disabled = true;
-            }
-            if (removedRarities.mega) {
-                document.getElementById('remove-mega').textContent = "Куплено";
-                document.getElementById('remove-mega').disabled = true;
-            }
-            
-            updateDiscoveredChances();
+            // Обновление доступности кнопок
+            document.getElementById('small-pack').disabled = gameState.money < packs.small.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('big-pack').disabled = gameState.money < packs.big.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('premium-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
         }
         
-        function updateDiscoveredChances() {
-            const chancesList = document.getElementById('chances-list');
-            // Оставляем только первый элемент (заголовок)
-            while (chancesList.children.length > 1) {
-                chancesList.removeChild(chancesList.lastChild);
+        // Рендер блоков
+        function renderBlocks() {
+            const blocksContainer = document.getElementById('blocks');
+            blocksContainer.innerHTML = '';
+            
+            // Инициализация массива placedCards, если нужно
+            while (gameState.placedCards.length < gameState.blocks) {
+                gameState.placedCards.push(null);
             }
             
-            // Добавляем только обнаруженные редкости
-            for (const rarity in discoveredRarities) {
-                const chanceElement = document.createElement('div');
-                chanceElement.className = 'rarity-chance ' + rarity + '-chance';
+            for (let i = 0; i < gameState.blocks; i++) {
+                const block = document.createElement('div');
+                block.className = 'block';
+                block.textContent = i + 1;
+                block.onclick = () => placeCard(i);
                 
-                const nameSpan = document.createElement('span');
-                nameSpan.textContent = translations[rarity] + ':';
-                
-                const chanceSpan = document.createElement('span');
-                const chances = calculateAdjustedChances();
-                const total = Object.values(chances).reduce((a, b) => a + b, 0);
-                chanceSpan.textContent = (chances[rarity] / total * 100).toFixed(4) + '%';
-                
-                chanceElement.appendChild(nameSpan);
-                chanceElement.appendChild(chanceSpan);
-                chancesList.appendChild(chanceElement);
-            }
-        }
-        
-        function calculateAdjustedChances() {
-            let chances = {...baseChances};
-            
-            // Удаляем выбранные редкости
-            for (const rarity in removedRarities) {
-                if (removedRarities[rarity]) {
-                    chances[rarity] = 0;
+                // Если в этом блоке уже есть карта
+                if (gameState.placedCards[i]) {
+                    const card = gameState.placedCards[i];
+                    const cardElement = document.createElement('div');
+                    cardElement.className = `placed-card card ${card.rarity}`;
+                    cardElement.onclick = (e) => {
+                        e.stopPropagation();
+                        removeCard(i);
+                    };
+                    
+                    const nameElement = document.createElement('div');
+                    nameElement.textContent = card.name;
+                    nameElement.style.fontWeight = 'bold';
+                    nameElement.style.fontSize = '12px';
+                    
+                    const incomeElement = document.createElement('div');
+                    incomeElement.textContent = `+${card.income}¢/сек`;
+                    incomeElement.style.fontSize = '10px';
+                    
+                    cardElement.appendChild(nameElement);
+                    cardElement.appendChild(incomeElement);
+                    block.appendChild(cardElement);
                 }
+                
+                blocksContainer.appendChild(block);
             }
-            
-            return chances;
         }
         
-        function spin() {
-            if (isCooldown) return;
+        // Рендер инвентаря
+        function renderInventory() {
+            const inventory = document.getElementById('inventory');
+            inventory.innerHTML = '';
             
-            isCooldown = true;
-            totalSpins++;
-            document.getElementById('spin-btn').disabled = true;
-            
-            const chances = calculateAdjustedChances();
-            const totalChance = Object.values(chances).reduce((a, b) => a + b, 0);
-            const random = Math.random() * totalChance;
-            let cumulativeChance = 0;
-            let resultRarity = '';
-            
-            for (const [key, value] of Object.entries(chances)) {
-                cumulativeChance += value;
-                if (random <= cumulativeChance) {
-                    resultRarity = key;
-                    break;
+            gameState.cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = `inventory-card card ${card.rarity}`;
+                cardElement.textContent = card.name;
+                cardElement.dataset.index = index;
+                
+                if (selectedCard === index) {
+                    cardElement.classList.add('selected');
                 }
-            }
-            
-            // Добавляем в обнаруженные
-            if (!discoveredRarities[resultRarity]) {
-                discoveredRarities[resultRarity] = true;
-            }
-            
-            processSpinResult(resultRarity);
+                
+                if (isSelling && index === sellingCardIndex) {
+                    cardElement.classList.add('selling');
+                }
+                
+                // Добавляем таймер для долгого нажатия
+                const timer = document.createElement('div');
+                timer.className = 'hold-timer';
+                cardElement.appendChild(timer);
+                
+                // Обработчики событий
+                cardElement.addEventListener('mousedown', () => startHold(index));
+                cardElement.addEventListener('touchstart', () => startHold(index));
+                cardElement.addEventListener('mouseup', () => endHold(index));
+                cardElement.addEventListener('mouseleave', cancelHold);
+                cardElement.addEventListener('touchend', () => endHold(index));
+                
+                inventory.appendChild(cardElement);
+            });
         }
         
-        function processSpinResult(rarity) {
-            const result = translateRarity(rarity);
-            const resultElement = document.getElementById('result');
+        // Начало удержания карты
+        function startHold(index) {
+            tapStartTime = Date.now();
+            sellingCardIndex = index;
             
-            resultElement.textContent = result;
-            resultElement.className = 'result ' + rarity;
+            // Запускаем таймер для продажи
+            holdTimers[index] = setTimeout(() => {
+                prepareToSell(index);
+            }, 1000);
             
-            coins += rewards[rarity];
+            // Анимация таймера
+            const cardElement = document.querySelector(`.inventory-card[data-index="${index}"]`);
+            if (cardElement) {
+                const timer = cardElement.querySelector('.hold-timer');
+                timer.style.width = '100%';
+                timer.style.transition = 'width 1s linear';
+            }
+        }
+        
+        // Подготовка к продаже
+        function prepareToSell(index) {
+            isSelling = true;
+            sellingCardIndex = index;
+            renderInventory();
             
-            if (!library.includes(rarity)) {
-                library.push(rarity);
-                updateLibrary();
+            // Продаем карту через небольшой промежуток для визуальной обратной связи
+            setTimeout(() => {
+                if (isSelling && sellingCardIndex === index) {
+                    sellCard(index);
+                }
+            }, 300);
+        }
+        
+        // Завершение удержания
+        function endHold(index) {
+            const tapDuration = Date.now() - tapStartTime;
+            
+            // Отменяем таймер продажи
+            if (holdTimers[index]) {
+                clearTimeout(holdTimers[index]);
+                delete holdTimers[index];
             }
             
-            // Специальные анимации
-            if (rarity === 'god') {
-                showGodAnimation();
-            } else if (rarity === 'death') {
-                showDeathAnimation();
-            } else if (rarity === 'mega') {
-                showMegaAnimation();
-            } else if (rarity === 'vechno') {
-                showVechnoAnimation();
-            } else if (rarity === 'master') {
-                showMasterAnimation();
-            } else if (rarity === 'glitch') {
-                resultElement.classList.add('glitch');
-                setTimeout(() => resultElement.classList.remove('glitch'), 3000);
-            } else if (rarity === 'blaster') {
-                showBlasterAnimation();
-            } else if (rarity === 'omega' && omegaAnimationEnabled) {
-                showOmegaAnimation();
+            // Сбрасываем анимацию таймера
+            const cardElement = document.querySelector(`.inventory-card[data-index="${index}"]`);
+            if (cardElement) {
+                const timer = cardElement.querySelector('.hold-timer');
+                timer.style.width = '0%';
+                timer.style.transition = 'none';
             }
+            
+            // Если было короткое нажатие - выбираем карту
+            if (tapDuration < 1000 && !isSelling) {
+                selectCard(index);
+            }
+            
+            // Сбрасываем состояние продажи
+            isSelling = false;
+            sellingCardIndex = null;
+        }
+        
+        // Отмена удержания
+        function cancelHold() {
+            // Отменяем все таймеры
+            Object.values(holdTimers).forEach(timer => clearTimeout(timer));
+            holdTimers = {};
+            
+            // Сбрасываем состояние продажи
+            isSelling = false;
+            sellingCardIndex = null;
+            renderInventory();
+        }
+        
+        // Выбор карты
+        function selectCard(index) {
+            selectedCard = index;
+            document.getElementById('selected-card-name').textContent = gameState.cards[index].name;
+            renderInventory();
+        }
+        
+        // Продажа карты
+        function sellCard(index) {
+            if (index >= 0 && index < gameState.cards.length) {
+                const card = gameState.cards[index];
+                const price = sellPrices[card.rarity] || 0;
+                
+                gameState.money += price;
+                gameState.cards.splice(index, 1);
+                
+                if (selectedCard === index) selectedCard = null;
+                else if (selectedCard > index) selectedCard--;
+                
+                updateUI();
+                renderInventory();
+                saveGame();
+            }
+        }
+        
+        // Размещение карты на блок
+        function placeCard(blockIndex) {
+            if (selectedCard === null) return;
+            
+            // Если в этом блоке уже есть карта, сначала убираем её
+            if (gameState.placedCards[blockIndex]) {
+                removeCard(blockIndex);
+            }
+            
+            // Помещаем новую карту
+            gameState.placedCards[blockIndex] = gameState.cards[selectedCard];
+            gameState.cards.splice(selectedCard, 1);
+            selectedCard = null;
+            document.getElementById('selected-card-name').textContent = '';
             
             updateUI();
-            startCooldown();
+            renderBlocks();
+            renderInventory();
+            saveGame();
         }
         
-        function translateRarity(rarity) {
-            return translations[rarity] || rarity;
-        }
-        
-        function startCooldown() {
-            let remaining = cooldownTime / 1000;
-            document.getElementById('cooldown').textContent = `Перезарядка: ${remaining.toFixed(1)} сек`;
-            
-            const interval = setInterval(() => {
-                remaining -= 0.1;
-                if (remaining <= 0) {
-                    clearInterval(interval);
-                    document.getElementById('cooldown').textContent = 'Готово к использованию';
-                    document.getElementById('spin-btn').disabled = false;
-                    isCooldown = false;
-                } else {
-                    document.getElementById('cooldown').textContent = `Перезарядка: ${remaining.toFixed(1)} сек`;
-                }
-            }, 100);
-        }
-        
-        function showGodAnimation() {
-            const darkScreen = document.getElementById('dark-screen');
-            const goldScreen = document.getElementById('gold-screen');
-            const specialText = document.getElementById('special-text');
-            
-            specialText.textContent = translations['god'];
-            specialText.style.color = 'white';
-            
-            darkScreen.style.opacity = '1';
-            darkScreen.style.pointerEvents = 'auto';
-            
-            setTimeout(() => {
-                darkScreen.style.opacity = '0';
-                darkScreen.style.pointerEvents = 'none';
-                goldScreen.style.opacity = '1';
+        // Удаление карты из блока
+        function removeCard(blockIndex) {
+            if (gameState.placedCards[blockIndex] && gameState.cards.length < gameState.maxCards) {
+                gameState.cards.push(gameState.placedCards[blockIndex]);
+                gameState.placedCards[blockIndex] = null;
                 
-                setTimeout(() => goldScreen.style.opacity = '0', 3000);
-            }, 1500);
+                updateUI();
+                renderBlocks();
+                renderInventory();
+                saveGame();
+            } else if (gameState.cards.length >= gameState.maxCards) {
+                alert('Инвентарь полон! Купите больше слотов.');
+            }
         }
         
-        function showDeathAnimation() {
-            const darkScreen = document.getElementById('dark-screen');
-            const redScreen = document.getElementById('red-screen');
-            const specialText = document.getElementById('special-text');
-            const resultElement = document.getElementById('result');
+        // Покупка пачки
+        function buyPack(packType) {
+            const pack = packs[packType];
             
-            specialText.textContent = translations['death'];
-            specialText.style.color = 'white';
-            
-            darkScreen.style.opacity = '1';
-            darkScreen.style.pointerEvents = 'auto';
-            
-            setTimeout(() => {
-                darkScreen.style.opacity = '0';
-                darkScreen.style.pointerEvents = 'none';
-                
-                let blinkCount = 0;
-                const blinkInterval = setInterval(() => {
-                    redScreen.style.opacity = redScreen.style.opacity === '1' ? '0' : '1';
-                    blinkCount++;
-                    
-                    if (blinkCount >= 50) {
-                        clearInterval(blinkInterval);
-                        redScreen.style.opacity = '0';
-                        
-                        const originalSize = resultElement.style.fontSize;
-                        resultElement.style.fontSize = '160px';
-                        
-                        setTimeout(() => resultElement.style.fontSize = originalSize, 1000);
-                    }
-                }, 200);
-            }, 1500);
-        }
-        
-        function showMegaAnimation() {
-            const blueScreen = document.getElementById('blue-screen');
-            let blinkCount = 0;
-            
-            const blinkInterval = setInterval(() => {
-                blueScreen.style.opacity = blueScreen.style.opacity === '1' ? '0' : '1';
-                blinkCount++;
-                
-                if (blinkCount >= 10) {
-                    clearInterval(blinkInterval);
-                    blueScreen.style.opacity = '0';
-                }
-            }, 200); // 10 раз за 2 секунды
-        }
-        
-        function showVechnoAnimation() {
-            const darkScreen = document.getElementById('dark-screen');
-            const whiteScreen = document.getElementById('white-screen');
-            const diamondContainer = document.getElementById('diamond-container');
-            const specialText = document.getElementById('special-text');
-            
-            darkScreen.style.opacity = '1';
-            darkScreen.style.pointerEvents = 'auto';
-            diamondContainer.innerHTML = '<div class="diamond">♦</div>';
-            specialText.textContent = '';
-            
-            // Анимация разрушения алмаза
-            const diamond = diamondContainer.firstChild;
-            let breakCount = 0;
-            const breakInterval = setInterval(() => {
-                diamond.style.animation = 'diamond-break 1s forwards';
-                breakCount++;
-                
-                if (breakCount >= 10) {
-                    clearInterval(breakInterval);
-                    diamondContainer.innerHTML = '';
-                    
-                    // Мигание белым
-                    let blinkCount = 0;
-                    const blinkInterval = setInterval(() => {
-                        whiteScreen.style.opacity = whiteScreen.style.opacity === '1' ? '0' : '1';
-                        blinkCount++;
-                        
-                        if (blinkCount >= 5) {
-                            clearInterval(blinkInterval);
-                            whiteScreen.style.opacity = '0';
-                            darkScreen.style.opacity = '0';
-                            darkScreen.style.pointerEvents = 'none';
-                            
-                            // Показываем результат
-                            specialText.textContent = translations['vechno'];
-                            specialText.style.color = 'white';
-                            setTimeout(() => {
-                                specialText.textContent = '';
-                            }, 3000);
-                        }
-                    }, 300); // 5 раз за 1.5 секунды
-                }
-            }, 1000); // 10 секунд
-        }
-        
-        function showMasterAnimation() {
-            const darkScreen = document.getElementById('dark-screen');
-            const goldScreen = document.getElementById('gold-screen');
-            const specialText = document.getElementById('special-text');
-            
-            specialText.textContent = 'МАСТЕР НА РИНГ';
-            specialText.style.color = 'white';
-            
-            darkScreen.style.opacity = '1';
-            darkScreen.style.pointerEvents = 'auto';
-            
-            setTimeout(() => {
-                darkScreen.style.opacity = '0';
-                darkScreen.style.pointerEvents = 'none';
-                specialText.textContent = '';
-                
-                // Мигание желтым как у божества
-                goldScreen.style.opacity = '1';
-                setTimeout(() => goldScreen.style.opacity = '0', 3000);
-            }, 10000);
-        }
-        
-        function showBlasterAnimation() {
-            const blueScreen = document.getElementById('blue-screen');
-            let blinkCount = 0;
-            
-            const blinkInterval = setInterval(() => {
-                blueScreen.style.opacity = blueScreen.style.opacity === '1' ? '0' : '1';
-                blinkCount++;
-                
-                if (blinkCount >= 10) {
-                    clearInterval(blinkInterval);
-                    blueScreen.style.opacity = '0';
-                }
-            }, 500); // 10 раз за 5 секунд
-        }
-        
-        function showOmegaAnimation() {
-            const omegaAttack = document.createElement('div');
-            omegaAttack.className = 'omega-attack';
-            
-            const darkScreen = document.createElement('div');
-            darkScreen.className = 'omega-dark-screen';
-            darkScreen.style.opacity = '0';
-            
-            const omegaText = document.createElement('div');
-            omegaText.className = 'omega-text';
-            omegaText.textContent = translations['omega'];
-            
-            const heartsContainer = document.createElement('div');
-            heartsContainer.className = 'omega-hearts-container';
-            
-            omegaAttack.appendChild(darkScreen);
-            omegaAttack.appendChild(omegaText);
-            omegaAttack.appendChild(heartsContainer);
-            document.body.appendChild(omegaAttack);
-            
-            setTimeout(() => {
-                darkScreen.style.opacity = '1';
-                
-                // Создаем сердца, которые вращаются вокруг текста ОМЕГА
-                for (let i = 0; i < 7; i++) {
-                    setTimeout(() => {
-                        const heart = document.createElement('div');
-                        heart.className = 'omega-heart';
-                        heart.innerHTML = '❤';
-                        heart.style.opacity = '1';
-                        heart.style.animation = `omega-rotate ${5 + i}s linear infinite`;
-                        heart.style.animationDelay = `${i * 0.2}s`;
-                        heartsContainer.appendChild(heart);
-                    }, 2000 * (i + 1));
-                }
-                
-                setTimeout(() => {
-                    heartsContainer.innerHTML = '';
-                    omegaText.style.opacity = '1';
-                    omegaText.style.animation = 'omega-shake 0.1s infinite';
-                    
-                    setTimeout(() => {
-                        omegaText.style.animation = 'none';
-                        setTimeout(() => omegaAttack.remove(), 1000);
-                    }, 10000);
-                }, 16000);
-            }, 0);
-        }
-        
-        function updateLibrary() {
-            const libraryElement = document.getElementById('library-items');
-            
-            if (library.length === 0) {
-                libraryElement.innerHTML = '<div class="library-item">Пока ничего не найдено...</div>';
+            if (gameState.money < pack.price) {
+                alert('Недостаточно денег!');
                 return;
             }
             
-            libraryElement.innerHTML = '';
-            library.sort().forEach(rarity => {
-                const item = document.createElement('div');
-                item.className = 'library-item';
-                item.textContent = `${translateRarity(rarity)} (${rewards[rarity]} монет)`;
-                item.style.color = getRarityColor(rarity);
-                
-                // Выделяем особо редкие предметы
-                if (['god', 'death', 'mega', 'vechno', 'master', 'omega'].includes(rarity)) {
-                    item.style.fontWeight = 'bold';
-                }
-                
-                libraryElement.appendChild(item);
-            });
-        }
-        
-        function getRarityColor(rarity) {
-            const colors = {
-                normal: 'black',
-                uncommon: 'green',
-                epic: 'blue',
-                legendary: 'purple',
-                mythic: 'orange',
-                shadow: 'gray',
-                king: 'gold',
-                angel: 'lightblue',
-                god: 'red',
-                death: 'black',
-                mega: '#00bcd4',
-                vechno: 'white',
-                master: '#ff9800',
-                heart: 'darkred',
-                glitch: '#9b59b6',
-                blaster: '#3498db',
-                omega: '#e74c3c'
-            };
-            return colors[rarity] || 'black';
-        }
-        
-        function setupShop() {
-            document.getElementById('upgrade-cooldown').addEventListener('click', () => {
-                if (coins >= 25) {
-                    coins -= 25;
-                    cooldownTime -= 500;
-                    updateUI();
-                }
-            });
+            if (gameState.cards.length >= gameState.maxCards) {
+                alert('Инвентарь полон! Купите больше слотов.');
+                return;
+            }
             
-            document.getElementById('remove-normal').addEventListener('click', () => {
-                if (coins >= 125 && !removedRarities.normal) {
-                    coins -= 125;
-                    removedRarities.normal = true;
-                    updateUI();
-                }
-            });
-            
-            document.getElementById('remove-uncommon').addEventListener('click', () => {
-                if (coins >= 250 && !removedRarities.uncommon) {
-                    coins -= 250;
-                    removedRarities.uncommon = true;
-                    updateUI();
-                }
-            });
-            
-            document.getElementById('remove-epic').addEventListener('click', () => {
-                if (coins >= 500 && !removedRarities.epic) {
-                    coins -= 500;
-                    removedRarities.epic = true;
-                    updateUI();
-                }
-            });
-            
-            document.getElementById('remove-legendary').addEventListener('click', () => {
-                if (coins >= 1000 && !removedRarities.legendary) {
-                    coins -= 1000;
-                    removedRarities.legendary = true;
-                    updateUI();
-                }
-            });
-            
-            document.getElementById('remove-mythic').addEventListener('click', () => {
-                if (coins >= 2000 && !removedRarities.mythic) {
-                    coins -= 2000;
-                    removedRarities.mythic = true;
-                    updateUI();
-                }
-            });
-            
-            document.getElementById('remove-angel').addEventListener('click', () => {
-                if (coins >= 50000 && !removedRarities.angel) {
-                    coins -= 50000;
-                    removedRarities.angel = true;
-                    updateUI();
-                }
-            });
-            
-            document.getElementById('remove-god').addEventListener('click', () => {
-                if (coins >= 75000 && !removedRarities.god) {
-                    coins -= 75000;
-                    removedRarities.god = true;
-                    updateUI();
-                }
-            });
-            
-            document.getElementById('remove-death').addEventListener('click', () => {
-                if (coins >= 100000 && !removedRarities.death) {
-                    coins -= 100000;
-                    removedRarities.death = true;
-                    updateUI();
-                }
-            });
-            
-            document.getElementById('remove-mega').addEventListener('click', () => {
-                if (coins >= 200000 && !removedRarities.mega) {
-                    coins -= 200000;
-                    removedRarities.mega = true;
-                    updateUI();
-                }
-            });
-        }
-        
-        function setupSettings() {
-            const settingsBtn = document.getElementById('settings-btn');
-            const settingsPanel = document.getElementById('settings-panel');
-            const darkModeBtn = document.getElementById('dark-mode-btn');
-            const omegaAnimationToggle = document.getElementById('omega-animation-toggle');
-            
-            settingsBtn.addEventListener('click', () => {
-                settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
-            });
-            
-            darkModeBtn.addEventListener('click', () => {
-                darkModeEnabled = !darkModeEnabled;
-                if (darkModeEnabled) {
-                    document.body.classList.add('dark-mode');
-                    darkModeBtn.textContent = 'Дневной режим';
-                } else {
-                    document.body.classList.remove('dark-mode');
-                    darkModeBtn.textContent = 'Ночной режим';
-                }
-            });
-            
-            omegaAnimationToggle.addEventListener('change', (e) => {
-                omegaAnimationEnabled = e.target.checked;
-            });
-        }
-        
-        function init() {
-            document.getElementById('spin-btn').addEventListener('click', spin);
-            setupShop();
-            setupSettings();
+            gameState.money -= pack.price;
             updateUI();
+            
+            // Определяем количество карт в пачке
+            const packSize = Math.floor(Math.random() * (pack.size.max - pack.size.min + 1)) + pack.size.min;
+            
+            // Начинаем открытие пачки
+            currentPack = pack;
+            cardsToOpen = packSize;
+            cardsOpened = 0;
+            
+            document.getElementById('pack-info').textContent = `Открываете ${getPackName(packType)} пачку (осталось: ${packSize} карт)`;
+            document.getElementById('pack-opening').style.display = 'flex';
+            
+            openNextCard();
         }
         
-        window.onload = init;
+        // Получение названия пачки
+        function getPackName(packType) {
+            switch(packType) {
+                case 'small': return 'маленькую';
+                case 'big': return 'большую';
+                case 'premium': return 'премиум';
+                default: return '';
+            }
+        }
+        
+        // Открытие следующей карты
+        function openNextCard() {
+            if (cardsOpened >= cardsToOpen) {
+                finishOpening();
+                return;
+            }
+            
+            const packCard = document.getElementById('pack-card');
+            packCard.innerHTML = '';
+            packCard.style.animation = 'none';
+            void packCard.offsetWidth; // Trigger reflow
+            packCard.style.animation = 'cardReveal 0.5s forwards';
+            
+            // Выбираем случайную карту согласно шансам
+            const card = getRandomCard(currentPack.cards);
+            
+            const nameElement = document.createElement('div');
+            nameElement.textContent = card.name;
+            nameElement.style.fontWeight = 'bold';
+            nameElement.style.fontSize = '18px';
+            nameElement.style.marginBottom = '10px';
+            
+            const rarityElement = document.createElement('div');
+            rarityElement.textContent = getRarityName(card.rarity);
+            rarityElement.style.fontSize = '14px';
+            rarityElement.style.marginBottom = '10px';
+            
+            const incomeElement = document.createElement('div');
+            incomeElement.textContent = `Доход: +${card.income}¢/сек`;
+            incomeElement.style.fontSize = '14px';
+            
+            packCard.className = `pack-card card ${card.rarity}`;
+            packCard.appendChild(nameElement);
+            packCard.appendChild(rarityElement);
+            packCard.appendChild(incomeElement);
+            
+            // Добавляем карту в инвентарь
+            gameState.cards.push(card);
+            cardsOpened++;
+            
+            document.getElementById('pack-info').textContent = `Открываете ${getPackName(getPackType(currentPack))} пачку (осталось: ${cardsToOpen - cardsOpened} карт)`;
+            updateUI();
+            saveGame();
+        }
+        
+        // Получение типа пачки
+        function getPackType(pack) {
+            for (const type in packs) {
+                if (packs[type] === pack) return type;
+            }
+            return null;
+        }
+        
+        // Получение названия редкости
+        function getRarityName(rarity) {
+            switch(rarity) {
+                case 'common': return 'Обычная';
+                case 'rare': return 'Редкая';
+                case 'epic': return 'Эпическая';
+                case 'legendary': return 'Легендарная';
+                case 'divine': return 'БОЖЕСТВЕННАЯ';
+                default: return '';
+            }
+        }
+        
+        // Завершение открытия пачки
+        function finishOpening() {
+            document.getElementById('pack-opening').style.display = 'none';
+            renderInventory();
+        }
+        
+        // Продолжить открытие
+        function continueOpening() {
+            openNextCard();
+        }
+        
+        // Получение случайной карты
+        function getRandomCard(cardPool) {
+            const totalChance = cardPool.reduce((sum, card) => sum + card.chance, 0);
+            let random = Math.random() * totalChance;
+            
+            for (const card of cardPool) {
+                if (random < card.chance) {
+                    return {...card}; // Возвращаем копию карты
+                }
+                random -= card.chance;
+            }
+            
+            return {...cardPool[0]}; // На всякий случай
+        }
+        
+        // Покупка блока
+        function buyBlock() {
+            if (gameState.money < gameState.blockPrice) {
+                alert('Недостаточно денег!');
+                return;
+            }
+            
+            gameState.money -= gameState.blockPrice;
+            gameState.blocks++;
+            gameState.placedCards.push(null); // Добавляем слот для новой карты
+            gameState.blockPrice = Math.floor(gameState.blockPrice * 1.5); // Увеличиваем цену на 50%
+            
+            updateUI();
+            renderBlocks();
+            saveGame();
+        }
+        
+        // Покупка слота
+        function buyCardSlot() {
+            if (gameState.money < gameState.slotPrice) {
+                alert('Недостаточно денег!');
+                return;
+            }
+            
+            gameState.money -= gameState.slotPrice;
+            gameState.maxCards++;
+            gameState.slotPrice = Math.floor(gameState.slotPrice * 1.5); // Увеличиваем цену на 50%
+            
+            updateUI();
+            saveGame();
+        }
+        
+        // Пассивный доход
+        function passiveIncome() {
+            let income = 0;
+            
+            // Подсчитываем доход со всех размещенных карт
+            gameState.placedCards.forEach(card => {
+                if (card) income += card.income;
+            });
+            
+            if (income > 0) {
+                gameState.money += income;
+                updateUI();
+                saveGame();
+            }
+        }
+        
+        // Запуск игры при загрузке
+        window.onload = initGame;
     </script>
 </body>
 </html>
