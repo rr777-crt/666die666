@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>карта-удача</title>
+    <title>Карточная Игра</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -451,7 +451,6 @@
 <body>
     <div class="game-container">
         <div class="stats">
-            <p>не сегодня :(</p>
             <div>Монеты: <span id="money">15</span>¢</div>
             <div>Алмазы: <span id="diamonds">0</span>♦</div>
             <div>Карты: <span id="total-cards">0</span>/<span id="max-cards">15</span></div>
@@ -470,7 +469,7 @@
                 <button id="premium-pack" onclick="buyPack('premium')">Премиум пачка (500¢)</button>
                 <button id="ultra-pack" onclick="buyPack('ultra')">Ультра пачка (50000¢)</button>
                 <button id="omega-pack" onclick="buyPack('omega')">ОМЕГА пачка (4000000¢)</button>
-             <button id="ruby-pack" onclick="buyPack('ruby')">Рубиновая пачка (45000000¢)</button>
+                <button id="ruby-pack" onclick="buyPack('ruby')">Рубиновая пачка (45000000¢)</button>
                 <button id="ppp-pack" onclick="buyPack('ppp')">СЕКРЕТНАЯ пачка (1000000000¢)</button>
             </div>
         </div>
@@ -491,7 +490,14 @@
             <button onclick="buyCardSlot()">+1 слотов (<span id="slot-price">5</span>¢)</button>
         </div>
         
-       
+        <div class="quest-container">
+            <div class="inventory-title">
+                <span>Квесты</span>
+                <span id="quest-timer">До нового квеста: 2:00</span>
+            </div>
+            <div id="current-quest">Нет активного квеста</div>
+            <button class="quest-button" id="get-quest-btn" onclick="handleQuestButton()">Взять квест у Джона</button>
+        </div>
         
         <div class="inventory">
             <div class="inventory-title">
@@ -515,19 +521,17 @@
     <div id="weather-effect" class="weather-effect" style="display: none;"></div>
     
     <footer>
-          <div class="quest-container">
+        <div class="quest-container">
             <div class="inventory-title">
                 <span>Квесты</span>
                 <span id="quest-timer">До нового квеста: 2:00</span>
             </div>
             <div id="current-quest">Нет активного квеста</div>
             <button class="quest-button" id="get-quest-btn" onclick="handleQuestButton()">Взять квест у Джона</button>
-       
-        
+        </div>
         <p>ОБНОВЛЕНИЕ КАЖДАЯ ПЯТНИЦА:</p>
         <p>18:00, новая версия: 1.1</p>
         <p>ОБНОВЛЕНИЕ ИНФО: хэй!хочешь награды? тебе нужно сделать...</p>
-        
     </footer>
     
     <script>
@@ -555,7 +559,7 @@
             activeMutations: {},
             currentQuest: null,
             questCompleted: false,
-            questTimer: 120, // 2 минуты в секундах
+            questTimer: 120,
             eventActive: null,
             eventTimer: null,
             eventIntervalId: null
@@ -645,28 +649,28 @@
                     { name: "FNAF", chance: 0.6, rarity: "divine", income: 300 }
                 ]
             },
-          ruby: {
-    price: 45000000,
-    size: { min: 4, max: 7 },
-    cards: [
-        { name: "stickman War", chance: 60, rarity: "mythic", income: 17.5 },
-        { name: "Genshin", chance: 35, rarity: "mythic", income: 20 },
-        { name: "BreawlStars", chance: 4.1, rarity: "mythic", income: 33 },
-        { name: "MySingingMonsters", chance: 0.9, rarity: "divine", income: 275 },
-    ]
-},  // <- Эта запятая была пропущена
-ppp: {
-    price: 1000000000,
-    size: { min: 1, max: 10 },
-    cards: [
-        { name: "MINECRAFT", chance: 50, rarity: "divine", income: 100 },
-        { name: "PACKMAN", chance: 35, rarity: "divine", income: 200 },
-        { name: "???", chance: 10, rarity: "secret", income: 1000 },
-        { name: "UNDERTAL", chance: 4.98, rarity: "secret", income: 2000 },
-        { name: "AI", chance: 0.1, rarity: "secret", income: 10000 },
-        { name: "GOD", chance: 0.01, rarity: "secret", income: 100000 }
-    ]
-}
+            ruby: {
+                price: 45000000,
+                size: { min: 4, max: 7 },
+                cards: [
+                    { name: "stickman War", chance: 60, rarity: "mythic", income: 17.5 },
+                    { name: "Genshin", chance: 35, rarity: "mythic", income: 20 },
+                    { name: "BreawlStars", chance: 4.1, rarity: "mythic", income: 33 },
+                    { name: "MySingingMonsters", chance: 0.9, rarity: "divine", income: 275 },
+                ]
+            },
+            ppp: {
+                price: 1000000000,
+                size: { min: 1, max: 10 },
+                cards: [
+                    { name: "MINECRAFT", chance: 50, rarity: "divine", income: 100 },
+                    { name: "PACKMAN", chance: 35, rarity: "divine", income: 200 },
+                    { name: "???", chance: 10, rarity: "secret", income: 1000 },
+                    { name: "UNDERTAL", chance: 4.98, rarity: "secret", income: 2000 },
+                    { name: "AI", chance: 0.1, rarity: "secret", income: 10000 },
+                    { name: "GOD", chance: 0.01, rarity: "secret", income: 100000 }
+                ]
+            }
         };
         
         // Квесты
@@ -723,12 +727,16 @@ ppp: {
         
         // События
         const events = [
-             {
-                id: 'No',
-                name: "Ничего",
+            {
+                id: 'nothing',
+                name: "Ничего не происходит",
                 chance: 50,
                 duration: 60,
-                   },
+                effect: () => {},
+                endEffect: () => {},
+                effectClass: '',
+                color: '#333'
+            },
             {
                 id: 'rain',
                 name: "Дождь",
@@ -739,12 +747,14 @@ ppp: {
                     if (!card.originalIncome) card.originalIncome = card.income;
                     card.income = card.originalIncome * 2;
                     card.mutation = 'wet';
+                    card.tempMutation = 'rain';
                 },
                 endEffect: (card) => {
-                    if (card.mutation === 'wet') {
+                    if (card.tempMutation === 'rain') {
                         card.income = card.originalIncome;
                         delete card.originalIncome;
                         delete card.mutation;
+                        delete card.tempMutation;
                     }
                 },
                 effectClass: 'rain-effect',
@@ -753,19 +763,21 @@ ppp: {
             {
                 id: 'snowstorm',
                 name: "Метель",
-                chance: 16,
+                chance: 15,
                 duration: 60,
                 interval: 15,
                 effect: (card) => {
                     if (!card.originalIncome) card.originalIncome = card.income;
-                    card.income = card.originalIncome * 4;
+                    card.income = card.originalIncome * 3;
                     card.mutation = 'icy';
+                    card.tempMutation = 'snowstorm';
                 },
                 endEffect: (card) => {
-                    if (card.mutation === 'icy') {
+                    if (card.tempMutation === 'snowstorm') {
                         card.income = card.originalIncome;
                         delete card.originalIncome;
                         delete card.mutation;
+                        delete card.tempMutation;
                     }
                 },
                 effectClass: 'snow-effect',
@@ -776,45 +788,26 @@ ppp: {
                 name: "Гроза",
                 chance: 5,
                 duration: 60,
-                interval: 29,
+                interval: 10,
                 effect: (card) => {
                     if (!card.originalIncome) card.originalIncome = card.income;
-                    card.income = card.originalIncome * 10;
+                    card.income = card.originalIncome * 5;
                     card.mutation = 'electric';
+                    card.tempMutation = 'thunderstorm';
                 },
                 endEffect: (card) => {
-                    if (card.mutation === 'electric') {
+                    if (card.tempMutation === 'thunderstorm') {
                         card.income = card.originalIncome;
                         delete card.originalIncome;
                         delete card.mutation;
+                        delete card.tempMutation;
                     }
                 },
                 effectClass: 'thunder-effect',
                 color: '#ffd700'
-            },
-            {
-                id: 'golden-rain',
-                name: "Золотой дождь",
-                chance: 1,
-                duration: 60,
-                interval: 5,
-                effect: (card) => {
-                    if (!card.originalIncome) card.originalIncome = card.income;
-                    card.income = card.originalIncome * 5;
-                    card.mutation = 'golden';
-                },
-                endEffect: (card) => {
-                    if (card.mutation === 'golden') {
-                        card.income = card.originalIncome;
-                        delete card.originalIncome;
-                        delete card.mutation;
-                    }
-                },
-                effectClass: 'rain-effect',
-                color: '#ffd700'
             }
         ];
-        
+
         // Инициализация игры
         function initGame() {
             loadGame();
@@ -822,19 +815,11 @@ ppp: {
             renderBlocks();
             renderInventory();
             
-            // Запуск пассивного дохода
             setInterval(passiveIncome, 1000);
-            
-            // Автосохранение каждые 30 секунд
             setInterval(saveGame, 30000);
-            
-            // Таймер квестов
             setInterval(updateQuestTimer, 1000);
-            
-            // Случайные события
             setInterval(checkForRandomEvent, 60000);
             
-            // Сохраняем при закрытии вкладки
             window.addEventListener('beforeunload', saveGame);
         }
         
@@ -850,7 +835,6 @@ ppp: {
             if (saved) {
                 const parsed = JSON.parse(saved);
                 
-                // Рассчитываем офлайн-доход
                 const now = Date.now();
                 const offlineTime = now - parsed.lastPlayTime;
                 const offlineSeconds = Math.floor(offlineTime / 1000);
@@ -869,7 +853,6 @@ ppp: {
                 
                 gameState = parsed;
                 
-                // Если есть активное событие, сбрасываем его
                 if (gameState.eventActive) {
                     endCurrentEvent();
                 }
@@ -898,16 +881,14 @@ ppp: {
             document.getElementById('block-price').textContent = gameState.blockPrice;
             document.getElementById('slot-price').textContent = gameState.slotPrice;
             
-            // Обновление доступности кнопок
             document.getElementById('small-pack').disabled = gameState.money < packs.small.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('big-pack').disabled = gameState.money < packs.big.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('premium-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('ultra-pack').disabled = gameState.money < packs.ultra.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('omega-pack').disabled = gameState.money < packs.omega.price || gameState.cards.length >= gameState.maxCards;
-           document.getElementById('ruby-pack').disabled = gameState.money < packs.ruby.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('ruby-pack').disabled = gameState.money < packs.ruby.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('ppp-pack').disabled = gameState.money < packs.ppp.price || gameState.cards.length >= gameState.maxCards;
             
-            // Обновление квеста
             updateQuestUI();
         }
         
@@ -946,7 +927,6 @@ ppp: {
             const blocksContainer = document.getElementById('blocks');
             blocksContainer.innerHTML = '';
             
-            // Инициализация массива placedCards, если нужно
             while (gameState.placedCards.length < gameState.blocks) {
                 gameState.placedCards.push(null);
             }
@@ -967,17 +947,16 @@ ppp: {
                     block.onclick = () => placeCard(i);
                 }
                 
-                // Если в этом блоке уже есть карта
                 if (gameState.placedCards[i]) {
                     const card = gameState.placedCards[i];
                     const cardElement = document.createElement('div');
                     
-                    // Добавляем классы в зависимости от мутации
                     let cardClasses = `placed-card card ${card.rarity}`;
                     if (card.mutation === 'golden') cardClasses += ' golden';
-                    if (card.mutation === 'wet') cardClasses += ' wet';
-                    if (card.mutation === 'icy') cardClasses += ' icy';
-                    if (card.mutation === 'electric') cardClasses += ' electric';
+                    else if (card.mutation === 'diamond') cardClasses += ' diamond';
+                    else if (card.mutation === 'wet') cardClasses += ' wet';
+                    else if (card.mutation === 'icy') cardClasses += ' icy';
+                    else if (card.mutation === 'electric') cardClasses += ' electric';
                     
                     cardElement.className = cardClasses;
                     
@@ -997,7 +976,6 @@ ppp: {
                     incomeElement.textContent = `+${card.income.toFixed(2)}¢/сек`;
                     incomeElement.style.fontSize = '10px';
                     
-                    // Добавляем иконку мутации, если есть
                     if (card.mutation) {
                         const mutationIcon = document.createElement('div');
                         mutationIcon.className = 'mutation-icon';
@@ -1056,12 +1034,10 @@ ppp: {
                     cardElement.classList.add('selling');
                 }
                 
-                // Добавляем таймер для долгого нажатия
                 const timer = document.createElement('div');
                 timer.className = 'hold-timer';
                 cardElement.appendChild(timer);
                 
-                // Обработчики событий
                 cardElement.addEventListener('mousedown', () => startHold(index));
                 cardElement.addEventListener('touchstart', () => startHold(index));
                 cardElement.addEventListener('mouseup', () => endHold(index));
@@ -1077,12 +1053,10 @@ ppp: {
             tapStartTime = Date.now();
             sellingCardIndex = index;
             
-            // Запускаем таймер для продажи
             holdTimers[index] = setTimeout(() => {
                 prepareToSell(index);
             }, 1000);
             
-            // Анимация таймера
             const cardElement = document.querySelector(`.inventory-card[data-index="${index}"]`);
             if (cardElement) {
                 const timer = cardElement.querySelector('.hold-timer');
@@ -1097,7 +1071,6 @@ ppp: {
             sellingCardIndex = index;
             renderInventory();
             
-            // Продаем карту через небольшой промежуток для визуальной обратной связи
             setTimeout(() => {
                 if (isSelling && sellingCardIndex === index) {
                     sellCard(index);
@@ -1109,13 +1082,11 @@ ppp: {
         function endHold(index) {
             const tapDuration = Date.now() - tapStartTime;
             
-            // Отменяем таймер продажи
             if (holdTimers[index]) {
                 clearTimeout(holdTimers[index]);
                 delete holdTimers[index];
             }
             
-            // Сбрасываем анимацию таймера
             const cardElement = document.querySelector(`.inventory-card[data-index="${index}"]`);
             if (cardElement) {
                 const timer = cardElement.querySelector('.hold-timer');
@@ -1123,23 +1094,19 @@ ppp: {
                 timer.style.transition = 'none';
             }
             
-            // Если было короткое нажатие - выбираем карту
             if (tapDuration < 1000 && !isSelling) {
                 selectCard(index);
             }
             
-            // Сбрасываем состояние продажи
             isSelling = false;
             sellingCardIndex = null;
         }
         
         // Отмена удержания
         function cancelHold() {
-            // Отменяем все таймеры
             Object.values(holdTimers).forEach(timer => clearTimeout(timer));
             holdTimers = {};
             
-            // Сбрасываем состояние продажи
             isSelling = false;
             sellingCardIndex = null;
             renderInventory();
@@ -1174,12 +1141,10 @@ ppp: {
         function placeCard(blockIndex) {
             if (selectedCard === null) return;
             
-            // Если в этом блоке уже есть карта, сначала убираем её
             if (gameState.placedCards[blockIndex]) {
                 removeCard(blockIndex);
             }
             
-            // Помещаем новую карту
             gameState.placedCards[blockIndex] = gameState.cards[selectedCard];
             gameState.cards.splice(selectedCard, 1);
             selectedCard = null;
@@ -1222,7 +1187,6 @@ ppp: {
             
             gameState.money -= pack.price;
             
-            // Увеличиваем счетчик открытых пачек
             if (packType === 'small') gameState.smallPacksOpened++;
             if (packType === 'big') gameState.bigPacksOpened++;
             if (packType === 'ultra') gameState.ultraPacksOpened++;
@@ -1230,10 +1194,8 @@ ppp: {
             updateUI();
             checkQuestCompletion();
             
-            // Определяем количество карт в пачке
             const packSize = Math.floor(Math.random() * (pack.size.max - pack.size.min + 1)) + pack.size.min;
             
-            // Начинаем открытие пачки
             currentPack = pack;
             cardsToOpen = packSize;
             cardsOpened = 0;
@@ -1268,13 +1230,11 @@ ppp: {
             const packCard = document.getElementById('pack-card');
             packCard.innerHTML = '';
             packCard.style.animation = 'none';
-            void packCard.offsetWidth; // Trigger reflow
+            void packCard.offsetWidth;
             packCard.style.animation = 'cardReveal 0.5s forwards';
             
-            // Выбираем случайную карту согласно шансам
             const card = getRandomCard(currentPack.cards);
             
-            // Проверяем, является ли карта редкой (шанс < 1%)
             if (card.chance < 1) {
                 gameState.rareCardsFound++;
                 checkQuestCompletion();
@@ -1300,7 +1260,6 @@ ppp: {
             packCard.appendChild(rarityElement);
             packCard.appendChild(incomeElement);
             
-            // Добавляем карту в инвентарь
             gameState.cards.push(card);
             cardsOpened++;
             
@@ -1349,12 +1308,12 @@ ppp: {
             
             for (const card of cardPool) {
                 if (random < card.chance) {
-                    return {...card}; // Возвращаем копию карты
+                    return {...card};
                 }
                 random -= card.chance;
             }
             
-            return {...cardPool[0]}; // На всякий случай
+            return {...cardPool[0]};
         }
         
         // Покупка блока
@@ -1367,8 +1326,8 @@ ppp: {
             gameState.money -= gameState.blockPrice;
             gameState.blocks++;
             gameState.blocksUpgraded++;
-            gameState.placedCards.push(null); // Добавляем слот для новой карты
-            gameState.blockPrice = Math.floor(gameState.blockPrice * 1.5); // Увеличиваем цену на 50%
+            gameState.placedCards.push(null);
+            gameState.blockPrice = Math.floor(gameState.blockPrice * 1.5);
             
             checkQuestCompletion();
             updateUI();
@@ -1386,7 +1345,7 @@ ppp: {
             gameState.money -= gameState.slotPrice;
             gameState.maxCards++;
             gameState.slotsUpgraded++;
-            gameState.slotPrice = Math.floor(gameState.slotPrice * 1.05); // Увеличиваем цену на 5%
+            gameState.slotPrice = Math.floor(gameState.slotPrice * 1.05);
             
             checkQuestCompletion();
             updateUI();
@@ -1397,7 +1356,6 @@ ppp: {
         function passiveIncome() {
             let income = 0;
             
-            // Подсчитываем доход со всех размещенных карт
             gameState.placedCards.forEach(card => {
                 if (card) income += card.income;
             });
@@ -1422,7 +1380,6 @@ ppp: {
                 document.getElementById('quest-timer').textContent = 
                     `До нового квеста: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
             } else {
-                // Таймер истек, можно взять новый квест
                 document.getElementById('get-quest-btn').disabled = false;
                 document.getElementById('quest-timer').textContent = 'Можно взять новый квест';
             }
@@ -1451,7 +1408,6 @@ ppp: {
                 return;
             }
             
-            // Выбираем случайный квест
             const random = Math.random() * 100;
             let questChance;
             
@@ -1465,7 +1421,7 @@ ppp: {
             const quest = quests.find(q => q.id === questChance);
             gameState.currentQuest = {...quest};
             gameState.questCompleted = false;
-            gameState.questTimer = 120; // 2 минуты
+            gameState.questTimer = 120;
             
             document.getElementById('get-quest-btn').disabled = true;
             updateQuestUI();
@@ -1485,7 +1441,6 @@ ppp: {
                     ${gameState.questCompleted ? '<br><strong>Готово! Нажмите "Взять квест" для награды</strong>' : ''}
                 `;
                 
-                // Обновляем текст кнопки
                 document.getElementById('get-quest-btn').textContent = 
                     gameState.questCompleted ? 'Получить награду' : 'Взять квест у Джона';
             } else {
@@ -1517,10 +1472,9 @@ ppp: {
             
             showNotification(`Квест выполнен! Получено ${reward.diamonds} алмазов`);
             
-            // Сбрасываем квест
             gameState.currentQuest = null;
             gameState.questCompleted = false;
-            gameState.questTimer = 120; // Устанавливаем таймер на 2 минуты
+            gameState.questTimer = 120;
             
             updateUI();
             saveGame();
@@ -1607,148 +1561,131 @@ ppp: {
         }
         
         // Применение мутации к карте
-       function applyMutation(blockIndex) {
-    if (!selectedMutation || !gameState.placedCards[blockIndex]) return;
+        function applyMutation(blockIndex) {
+            if (!selectedMutation || !gameState.placedCards[blockIndex]) return;
 
-    const card = gameState.placedCards[blockIndex];
-    const currentMutation = card.mutation;
+            const card = gameState.placedCards[blockIndex];
+            
+            // Если уже есть такая же мутация - удаляем
+            if (card.mutation === selectedMutation) {
+                if (card.originalIncome !== undefined) {
+                    card.income = card.originalIncome;
+                    delete card.originalIncome;
+                }
+                delete card.mutation;
+                showNotification(`Мутация "${getMutationName(selectedMutation)}" удалена с карты "${card.name}"!`);
+            } 
+            // Если другая мутация - заменяем
+            else {
+                // Удаляем предыдущую мутацию если есть
+                if (card.mutation) {
+                    if (card.originalIncome !== undefined) {
+                        card.income = card.originalIncome;
+                        delete card.originalIncome;
+                    }
+                    delete card.mutation;
+                }
+                
+                // Удаляем временные эффекты
+                if (card.tempMutation) {
+                    const event = events.find(e => e.id === card.tempMutation);
+                    if (event) event.endEffect(card);
+                    delete card.tempMutation;
+                }
 
-    // Если мутация уже есть на карте и она совпадает с выбранной - удаляем её
-    if (currentMutation === selectedMutation) {
-        // Возвращаем карту к исходному состоянию
-        if (card.originalIncome !== undefined) {
-            card.income = card.originalIncome;
-            delete card.originalIncome;
-        }
-        delete card.mutation;
-
-        showNotification(`Мутация "${getMutationName(selectedMutation)}" удалена с карты "${card.name}"!`);
-    } 
-    // Если мутация другая - заменяем её
-    else {
-        // Сначала удаляем предыдущую мутацию (если есть)
-        if (currentMutation) {
-            if (card.originalIncome !== undefined) {
-                card.income = card.originalIncome;
-                delete card.originalIncome;
+                // Применяем новую мутацию
+                card.originalIncome = card.income;
+                switch(selectedMutation) {
+                    case 'golden':
+                        card.income *= 5;
+                        card.mutation = 'golden';
+                        break;
+                    case 'diamond':
+                        card.income *= 15;
+                        card.mutation = 'diamond';
+                        break;
+                }
+                showNotification(`Мутация "${getMutationName(selectedMutation)}" применена к карте "${card.name}"!`);
             }
-            delete card.mutation;
+
+            selectedMutation = null;
+            mutationApplying = false;
+            updateUI();
+            renderBlocks();
+            saveGame();
         }
 
-        // Применяем новую мутацию
-        card.originalIncome = card.income;
-
-        switch(selectedMutation) {
-            case 'golden':
-                card.income *= 5;
-                card.mutation = 'golden';
-                break;
-            case 'diamond':
-                card.income *= 15;
-                card.mutation = 'diamond';
-                break;
-            case 'wet':
-                card.income *= 2;
-                card.mutation = 'wet';
-                break;
-            case 'icy':
-                card.income *= 3;
-                card.mutation = 'icy';
-                break;
-            case 'electric':
-                card.income *= 6;
-                card.mutation = 'electric';
-                break;
+        // Получение названия мутации
+        function getMutationName(mutationType) {
+            switch(mutationType) {
+                case 'golden': return 'Золотая';
+                case 'diamond': return 'Алмазная';
+                default: return '';
+            }
         }
-
-        showNotification(`Мутация "${getMutationName(selectedMutation)}" применена к карте "${card.name}"!`);
-    }
-
-    // Сбрасываем состояние применения мутации
-    selectedMutation = null;
-    mutationApplying = false;
-
-    updateUI();
-    renderBlocks();
-    saveGame();
-}
-
-// Вспомогательная функция для получения названия мутации
-function getMutationName(mutationType) {
-    switch(mutationType) {
-        case 'golden': return 'Золотая';
-        case 'diamond': return 'Алмазная';
-        case 'wet': return 'Влажная';
-        case 'icy': return 'Ледяная';
-        case 'electric': return 'Электрическая';
-        default: return '';
-    }
-}
         
         // Проверка на случайное событие
         function checkForRandomEvent() {
             if (gameState.placedCards.length === 0) return;
-            
-            // Если уже есть активное событие, ничего не делаем
             if (gameState.eventActive) return;
-            
-            const random = Math.random() * 100;
-            let eventChance = 0;
+
+            const totalChance = events.reduce((sum, e) => sum + e.chance, 0);
+            let random = Math.random() * totalChance;
             let selectedEvent = null;
-            
-            // Выбираем событие по шансам
+
             for (const event of events) {
-                if (random < event.chance + eventChance) {
+                if (random < event.chance) {
                     selectedEvent = event;
                     break;
                 }
-                eventChance += event.chance;
+                random -= event.chance;
             }
-            
-            if (!selectedEvent) return; // 50% - ничего не происходит
-            
+
+            if (!selectedEvent || selectedEvent.id === 'nothing') return;
+
             gameState.eventActive = selectedEvent.id;
             showNotification(`Начинается ${selectedEvent.name}!`, selectedEvent.color);
-            
-            // Показываем эффект погоды
+
             const weatherEffect = document.getElementById('weather-effect');
             weatherEffect.className = `weather-effect ${selectedEvent.effectClass}`;
             weatherEffect.style.display = 'block';
+
+            // Применяем эффект сразу ко всем подходящим картам
+            gameState.placedCards.forEach(card => {
+                if (card && !card.mutation) { // Не применяем к картам с постоянными мутациями
+                    selectedEvent.effect(card);
+                }
+            });
+
+            // Устанавливаем интервал для новых эффектов
+            gameState.eventIntervalId = setInterval(() => {
+                applyEventEffect(selectedEvent);
+            }, selectedEvent.interval * 1000);
             
-            // Запускаем эффект события
-            startEventEffect(selectedEvent);
-            
-            // Устанавливаем таймер окончания события
             gameState.eventTimer = setTimeout(() => {
                 endCurrentEvent();
                 showNotification(`${selectedEvent.name} закончился.`, selectedEvent.color);
             }, selectedEvent.duration * 1000);
             
+            renderBlocks();
             saveGame();
         }
-        
-        // Запуск эффекта события
-        function startEventEffect(event) {
-            // Применяем эффект сразу при старте
-            applyEventEffect(event);
-            
-            // Устанавливаем интервал для повторного применения эффекта
-            gameState.eventIntervalId = setInterval(() => {
-                applyEventEffect(event);
-            }, event.interval * 1000);
-        }
-        
-        // Применение эффекта события к случайной карте
+
+        // Применение эффекта к случайной карте
         function applyEventEffect(event) {
-            const activeCards = gameState.placedCards.filter(card => card !== null);
+            const activeCards = gameState.placedCards.filter(card => 
+                card !== null && !card.mutation // Только карты без постоянных мутаций
+            );
+            
             if (activeCards.length === 0) return;
             
             const randomIndex = Math.floor(Math.random() * activeCards.length);
             const card = activeCards[randomIndex];
             
-            // Удаляем предыдущий эффект события, если есть
-            if (card.mutation && card.mutation !== 'golden' && card.mutation !== 'diamond') {
-                event.endEffect(card);
+            // Удаляем предыдущий временный эффект если есть
+            if (card.tempMutation) {
+                const prevEvent = events.find(e => e.id === card.tempMutation);
+                if (prevEvent) prevEvent.endEffect(card);
             }
             
             // Применяем новый эффект
@@ -1759,43 +1696,40 @@ function getMutationName(mutationType) {
             renderBlocks();
             saveGame();
         }
-        
-        // Завершение текущего события
+
+        // Завершение события
         function endCurrentEvent() {
             if (!gameState.eventActive) return;
             
             const event = events.find(e => e.id === gameState.eventActive);
             if (!event) return;
             
-            // Очищаем интервал
+            // Удаляем все эффекты этого события
+            gameState.placedCards.forEach(card => {
+                if (card && card.tempMutation === event.id) {
+                    event.endEffect(card);
+                }
+            });
+            
+            // Очищаем таймеры
             if (gameState.eventIntervalId) {
                 clearInterval(gameState.eventIntervalId);
                 gameState.eventIntervalId = null;
             }
             
-            // Очищаем таймер
             if (gameState.eventTimer) {
                 clearTimeout(gameState.eventTimer);
                 gameState.eventTimer = null;
             }
             
-            // Удаляем эффекты со всех карт
-            gameState.placedCards.forEach(card => {
-                if (card && card.mutation && card.mutation !== 'golden' && card.mutation !== 'diamond') {
-                    event.endEffect(card);
-                }
-            });
-            
             // Скрываем эффект погоды
             document.getElementById('weather-effect').style.display = 'none';
-            
-            // Сбрасываем активное событие
             gameState.eventActive = null;
             
             renderBlocks();
             saveGame();
         }
-        
+
         // Показать уведомление
         function showNotification(message, color = '#333') {
             const notification = document.createElement('div');
@@ -1805,7 +1739,6 @@ function getMutationName(mutationType) {
             
             document.body.appendChild(notification);
             
-            // Удаляем уведомление после анимации
             setTimeout(() => {
                 notification.remove();
             }, 3000);
