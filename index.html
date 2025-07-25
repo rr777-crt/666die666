@@ -88,6 +88,12 @@
             background-color: #fff2cc;
             color: #663300;
         }
+
+          .card.mythic {
+            border: 2px solid #ff9900;
+            background-color: red;
+            color: #763300;
+        }
         
         .card.divine {
             background: linear-gradient(45deg, #ff0000, #ff9900, #33cc33, #0099ff, #9933ff);
@@ -96,6 +102,11 @@
             border: 2px solid gold;
             color: white;
             text-shadow: 0 0 3px black;
+        }
+        .card.secret {
+            border: 2px solid #ff9900;
+            background-color: black;
+            color: #000000;
         }
         
         @keyframes rainbow {
@@ -260,11 +271,14 @@
             <button id="small-pack" onclick="buyPack('small')">Маленькая пачка (5¢)</button>
             <button id="big-pack" onclick="buyPack('big')">Большая пачка (50¢)</button>
             <button id="premium-pack" onclick="buyPack('premium')">Премиум пачка (500¢)</button>
+             <button id="Ultra-pack" onclick="buyPack('Ultra')">Ультра пачка (50000¢)</button>
+             <button id="OMEGA-pack" onclick="buyPack('OMEGA')">ОМЕГА пачка (4000000¢)</button>
+             <button id="PPP-pack" onclick="buyPack('PPP')"> СЕКРЕТНАЯ пачка (1000000000¢)</button>
         </div>
         
         <div class="upgrades">
             <button onclick="buyBlock()">+1 блок (<span id="block-price">25</span>¢)</button>
-            <button onclick="buyCardSlot()">+1 слот (<span id="slot-price">5</span>¢)</button>
+            <button onclick="buyCardSlot()">+1 слотов (<span id="slot-price">5</span>¢)</button>
         </div>
         
         <div class="inventory">
@@ -313,7 +327,7 @@
             rare: 3,
             epic: 10,
             legendary: 40,
-            divine: 400
+            divine: 40000
         };
         
         // Карточные пачки
@@ -340,7 +354,7 @@
                     { name: "Bandi", chance: 1, rarity: "epic", income: 1.2 }
                 ]
             },
-            premium: {
+            Ultra: {
                 price: 500,
                 size: { min: 4, max: 6 },
                 cards: [
@@ -351,7 +365,44 @@
                     { name: "GitHub", chance: 0.5, rarity: "legendary", income: 5 },
                     { name: "MINECRAFT", chance: 0.05, rarity: "divine", income: 100 }
                 ]
-            }
+            },
+              Ultra: {
+                price: 50000,
+                size: { min: 5, max: 7 },
+                cards: [
+                     { name: "ULTRAKILL", chance: 40, rarity: "legendary", income: 3.25 },
+                    { name: "Nothing", chance: 20, rarity: "legendary", income: 3.75 },
+                    { name: "Ball", chance: 15, rarity: "legendary", income: 4.1 },
+                    { name: "GitHub", chance: 10, rarity: "legendary", income: 5 },
+                    { name: "GeometryDash", chance: 7, rarity: "legendary", income: 7 },
+                    { name: "HollowKnight", chance: 6, rarity: "mythic", income: 15 },
+                     { name: "Genshin", chance: 1.5, rarity: "mythic", income: 20 },
+                     { name: "MINECRAFT", chance: 0.5, rarity: "divine", income: 100 }
+                ]
+            },
+              OMEGA: {
+                price: 4000000,
+                size: { min: 2, max: 4 },
+                cards: [
+                    { name: "GeometryDash", chance: 70, rarity: "legendary", income: 7 },
+                    { name: "Genshin", chance: 25, rarity: "mythic", income: 20 },
+                   { name: "MINECRAFT", chance: 4.4, rarity: "divine", income: 100 },
+                    { name: "FNAF", chance: 0.6, rarity: "divene", income: 300 }
+                    
+                ]
+            },
+              PPP: {
+                price: 1000000000,
+                size: { min: 1, max: 10 },
+                cards: [
+                      { name: "MINECRAFT", chance: 50, rarity: "divine", income: 100 },
+                      { name: "MINECRAFT", chance: 35, rarity: "divine", income: 200 },
+                      { name: "MINECRAFT", chance: 10, rarity: "secret", income: 1000 },
+                      { name: "MINECRAFT", chance: 4.9, rarity: "secret", income: 2000 },
+                      { name: "AI", chance: 0.1, rarity: "secret", income: 10000 }
+                   
+                ]
+            },
         };
         
         // Инициализация игры
@@ -429,6 +480,9 @@
             document.getElementById('small-pack').disabled = gameState.money < packs.small.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('big-pack').disabled = gameState.money < packs.big.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('premium-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
+             document.getElementById('Ultra-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
+             document.getElementById('OMEGA-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
+             document.getElementById('PPP-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
         }
         
         // Рендер блоков
@@ -681,6 +735,9 @@
                 case 'small': return 'маленькую';
                 case 'big': return 'большую';
                 case 'premium': return 'премиум';
+                case 'Ultra': return 'Ультра';
+                case 'OMEGA': return 'ОМЕГА';
+                case 'PPP': return 'СЕКРЕТНАЯ';
                 default: return '';
             }
         }
@@ -745,6 +802,8 @@
                 case 'rare': return 'Редкая';
                 case 'epic': return 'Эпическая';
                 case 'legendary': return 'Легендарная';
+                case 'mythic': return 'мифическая';
+                case 'secret': return 'SECRET';
                 case 'divine': return 'БОЖЕСТВЕННАЯ';
                 default: return '';
             }
@@ -802,7 +861,7 @@
             
             gameState.money -= gameState.slotPrice;
             gameState.maxCards++;
-            gameState.slotPrice = Math.floor(gameState.slotPrice * 1.5); // Увеличиваем цену на 50%
+            gameState.slotPrice = Math.floor(gameState.slotPrice * 1.05); // Увеличиваем цену на 50%
             
             updateUI();
             saveGame();
