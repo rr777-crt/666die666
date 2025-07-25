@@ -89,7 +89,7 @@
             color: #663300;
         }
 
-          .card.mythic {
+        .card.mythic {
             border: 2px solid #ff9900;
             background-color: red;
             color: #763300;
@@ -103,10 +103,11 @@
             color: white;
             text-shadow: 0 0 3px black;
         }
+        
         .card.secret {
             border: 2px solid #ff9900;
             background-color: black;
-            color: #000000;
+            color: white;
         }
         
         @keyframes rainbow {
@@ -254,6 +255,20 @@
             height: 90%;
             cursor: pointer;
         }
+        
+        .shop-toggle {
+            margin-top: 10px;
+            background-color: #2196F3;
+        }
+        
+        .shop-container {
+            display: none;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -267,13 +282,17 @@
             <!-- Блоки будут добавлены динамически -->
         </div>
         
-        <div class="pack-buttons">
-            <button id="small-pack" onclick="buyPack('small')">Маленькая пачка (5¢)</button>
-            <button id="big-pack" onclick="buyPack('big')">Большая пачка (50¢)</button>
-            <button id="premium-pack" onclick="buyPack('premium')">Премиум пачка (500¢)</button>
-             <button id="Ultra-pack" onclick="buyPack('Ultra')">Ультра пачка (50000¢)</button>
-             <button id="OMEGA-pack" onclick="buyPack('OMEGA')">ОМЕГА пачка (4000000¢)</button>
-             <button id="PPP-pack" onclick="buyPack('PPP')"> СЕКРЕТНАЯ пачка (1000000000¢)</button>
+        <button class="shop-toggle" id="shop-toggle" onclick="toggleShop()">Показать магазин пачек</button>
+        
+        <div class="shop-container" id="shop-container">
+            <div class="pack-buttons">
+                <button id="small-pack" onclick="buyPack('small')">Маленькая пачка (5¢)</button>
+                <button id="big-pack" onclick="buyPack('big')">Большая пачка (50¢)</button>
+                <button id="premium-pack" onclick="buyPack('premium')">Премиум пачка (500¢)</button>
+                <button id="ultra-pack" onclick="buyPack('ultra')">Ультра пачка (50000¢)</button>
+                <button id="omega-pack" onclick="buyPack('omega')">ОМЕГА пачка (4000000¢)</button>
+                <button id="ppp-pack" onclick="buyPack('ppp')">СЕКРЕТНАЯ пачка (1000000000¢)</button>
+            </div>
         </div>
         
         <div class="upgrades">
@@ -320,6 +339,8 @@
         let holdTimers = {};
         let tapStartTime = 0;
         let isSelling = false;
+        let sellingCardIndex = null;
+        let isShopOpen = false;
 
         // Цены продажи карт
         const sellPrices = {
@@ -327,7 +348,9 @@
             rare: 3,
             epic: 10,
             legendary: 40,
-            divine: 40000
+            mythic: 200,
+            divine: 40000,
+            secret: 100000
         };
         
         // Карточные пачки
@@ -354,7 +377,7 @@
                     { name: "Bandi", chance: 1, rarity: "epic", income: 1.2 }
                 ]
             },
-            Ultra: {
+            premium: {
                 price: 500,
                 size: { min: 4, max: 6 },
                 cards: [
@@ -366,43 +389,41 @@
                     { name: "MINECRAFT", chance: 0.05, rarity: "divine", income: 100 }
                 ]
             },
-              Ultra: {
+            ultra: {
                 price: 50000,
                 size: { min: 5, max: 7 },
                 cards: [
-                     { name: "ULTRAKILL", chance: 40, rarity: "legendary", income: 3.25 },
+                    { name: "ULTRAKILL", chance: 40, rarity: "legendary", income: 3.25 },
                     { name: "Nothing", chance: 20, rarity: "legendary", income: 3.75 },
                     { name: "Ball", chance: 15, rarity: "legendary", income: 4.1 },
                     { name: "GitHub", chance: 10, rarity: "legendary", income: 5 },
                     { name: "GeometryDash", chance: 7, rarity: "legendary", income: 7 },
                     { name: "HollowKnight", chance: 6, rarity: "mythic", income: 15 },
-                     { name: "Genshin", chance: 1.5, rarity: "mythic", income: 20 },
-                     { name: "MINECRAFT", chance: 0.5, rarity: "divine", income: 100 }
+                    { name: "Genshin", chance: 1.5, rarity: "mythic", income: 20 },
+                    { name: "MINECRAFT", chance: 0.5, rarity: "divine", income: 100 }
                 ]
             },
-              OMEGA: {
+            omega: {
                 price: 4000000,
                 size: { min: 2, max: 4 },
                 cards: [
                     { name: "GeometryDash", chance: 70, rarity: "legendary", income: 7 },
                     { name: "Genshin", chance: 25, rarity: "mythic", income: 20 },
-                   { name: "MINECRAFT", chance: 4.4, rarity: "divine", income: 100 },
-                    { name: "FNAF", chance: 0.6, rarity: "divene", income: 300 }
-                    
+                    { name: "MINECRAFT", chance: 4.4, rarity: "divine", income: 100 },
+                    { name: "FNAF", chance: 0.6, rarity: "divine", income: 300 }
                 ]
             },
-              PPP: {
+            ppp: {
                 price: 1000000000,
                 size: { min: 1, max: 10 },
                 cards: [
-                      { name: "MINECRAFT", chance: 50, rarity: "divine", income: 100 },
-                      { name: "MINECRAFT", chance: 35, rarity: "divine", income: 200 },
-                      { name: "MINECRAFT", chance: 10, rarity: "secret", income: 1000 },
-                      { name: "MINECRAFT", chance: 4.9, rarity: "secret", income: 2000 },
-                      { name: "AI", chance: 0.1, rarity: "secret", income: 10000 }
-                   
+                    { name: "MINECRAFT", chance: 50, rarity: "divine", income: 100 },
+                    { name: "MINECRAFT", chance: 35, rarity: "divine", income: 200 },
+                    { name: "MINECRAFT", chance: 10, rarity: "secret", income: 1000 },
+                    { name: "MINECRAFT", chance: 4.9, rarity: "secret", income: 2000 },
+                    { name: "AI", chance: 0.1, rarity: "secret", income: 10000 }
                 ]
-            },
+            }
         };
         
         // Инициализация игры
@@ -480,9 +501,24 @@
             document.getElementById('small-pack').disabled = gameState.money < packs.small.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('big-pack').disabled = gameState.money < packs.big.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('premium-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
-             document.getElementById('Ultra-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
-             document.getElementById('OMEGA-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
-             document.getElementById('PPP-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('ultra-pack').disabled = gameState.money < packs.ultra.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('omega-pack').disabled = gameState.money < packs.omega.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('ppp-pack').disabled = gameState.money < packs.ppp.price || gameState.cards.length >= gameState.maxCards;
+        }
+        
+        // Переключение видимости магазина
+        function toggleShop() {
+            isShopOpen = !isShopOpen;
+            const shopContainer = document.getElementById('shop-container');
+            const shopToggle = document.getElementById('shop-toggle');
+            
+            if (isShopOpen) {
+                shopContainer.style.display = 'block';
+                shopToggle.textContent = 'Скрыть магазин пачек';
+            } else {
+                shopContainer.style.display = 'none';
+                shopToggle.textContent = 'Показать магазин пачек';
+            }
         }
         
         // Рендер блоков
@@ -735,9 +771,9 @@
                 case 'small': return 'маленькую';
                 case 'big': return 'большую';
                 case 'premium': return 'премиум';
-                case 'Ultra': return 'Ультра';
-                case 'OMEGA': return 'ОМЕГА';
-                case 'PPP': return 'СЕКРЕТНАЯ';
+                case 'ultra': return 'ультра';
+                case 'omega': return 'ОМЕГА';
+                case 'ppp': return 'СЕКРЕТНУЮ';
                 default: return '';
             }
         }
@@ -802,7 +838,7 @@
                 case 'rare': return 'Редкая';
                 case 'epic': return 'Эпическая';
                 case 'legendary': return 'Легендарная';
-                case 'mythic': return 'мифическая';
+                case 'mythic': return 'Мифическая';
                 case 'secret': return 'SECRET';
                 case 'divine': return 'БОЖЕСТВЕННАЯ';
                 default: return '';
