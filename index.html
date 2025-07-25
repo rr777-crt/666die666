@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ЗАКРЫТО!</title>
+    <title>карта-удача</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -451,6 +451,7 @@
 <body>
     <div class="game-container">
         <div class="stats">
+            <p>не сегодня :(</p>
             <div>Монеты: <span id="money">15</span>¢</div>
             <div>Алмазы: <span id="diamonds">0</span>♦</div>
             <div>Карты: <span id="total-cards">0</span>/<span id="max-cards">15</span></div>
@@ -464,7 +465,7 @@
         
         <div class="shop-container" id="shop-container">
             <div class="pack-buttons">
-                <button id="small-pack" onclick="buyPack('small')">Маленькая пачка (50000000000000000¢)</button>
+                <button id="small-pack" onclick="buyPack('small')">Маленькая пачка (5¢)</button>
                 <button id="big-pack" onclick="buyPack('big')">Большая пачка (50¢)</button>
                 <button id="premium-pack" onclick="buyPack('premium')">Премиум пачка (500¢)</button>
                 <button id="ultra-pack" onclick="buyPack('ultra')">Ультра пачка (50000¢)</button>
@@ -903,7 +904,7 @@ ppp: {
             document.getElementById('premium-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('ultra-pack').disabled = gameState.money < packs.ultra.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('omega-pack').disabled = gameState.money < packs.omega.price || gameState.cards.length >= gameState.maxCards;
-              document.getElementById('ruby-pack').disabled = gameState.money < packs.omega.price || gameState.cards.length >= gameState.maxCards;
+           document.getElementById('ruby-pack').disabled = gameState.money < packs.ruby.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('ppp-pack').disabled = gameState.money < packs.ppp.price || gameState.cards.length >= gameState.maxCards;
             
             // Обновление квеста
