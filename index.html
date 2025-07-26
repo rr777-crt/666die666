@@ -540,7 +540,8 @@
             questTimer: 120,
             eventActive: null,
             eventTimer: null,
-            eventIntervalId: null
+            eventIntervalId: null,
+            lastQuestUpdate: Date.now()
         };
         
         let selectedCard = null;
@@ -830,6 +831,7 @@
                 }
                 
                 gameState = parsed;
+                gameState.lastQuestUpdate = Date.now();
                 
                 if (gameState.eventActive) {
                     endCurrentEvent();
@@ -1166,8 +1168,8 @@
             gameState.money -= pack.price;
             
             if (packType === 'small') gameState.smallPacksOpened++;
-            if (packType === 'big') gameState.bigPacksOpened++;
-            if (packType === 'ultra') gameState.ultraPacksOpened++;
+            else if (packType === 'big') gameState.bigPacksOpened++;
+            else if (packType === 'ultra') gameState.ultraPacksOpened++;
             
             updateUI();
             checkQuestCompletion();
@@ -1347,17 +1349,32 @@
         
         // Обновление таймера квестов
         function updateQuestTimer() {
-            if (gameState.currentQuest && !gameState.questCompleted) return;
+            const now = Date.now();
+            const delta = now - gameState.lastQuestUpdate;
+            gameState.lastQuestUpdate = now;
             
+            // Если есть активный незавершенный квест - не обновляем таймер
+            if (gameState.currentQuest && !gameState.questCompleted) {
+                return;
+            }
+            
+            // Уменьшаем таймер только если нет активного квеста
             if (gameState.questTimer > 0) {
-                gameState.questTimer--;
+                gameState.questTimer -= Math.floor(delta / 1000);
+                
+                if (gameState.questTimer < 0) {
+                    gameState.questTimer = 0;
+                }
                 
                 const minutes = Math.floor(gameState.questTimer / 60);
                 const seconds = gameState.questTimer % 60;
                 
                 document.getElementById('quest-timer').textContent = 
                     `До нового квеста: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-            } else {
+            }
+            
+            // Если таймер истек - разрешаем взять новый квест
+            if (gameState.questTimer <= 0) {
                 document.getElementById('get-quest-btn').disabled = false;
                 document.getElementById('quest-timer').textContent = 'Можно взять новый квест';
             }
@@ -1376,6 +1393,7 @@
         
         // Получение нового квеста
         function getNewQuest() {
+            // Проверяем, можно ли взять новый квест
             if (gameState.currentQuest && !gameState.questCompleted) {
                 alert('Сначала завершите текущий квест!');
                 return;
@@ -1386,20 +1404,19 @@
                 return;
             }
             
-            const random = Math.random() * 100;
-            let questChance;
+            // Выбираем случайный квест
+            const availableQuests = quests.filter(q => {
+                // Исключаем квест "Найти редкую карту", если уже найдена
+                if (q.id === 6 && gameState.rareCardsFound > 0) return false;
+                return true;
+            });
             
-            if (random < 20) questChance = 1;
-            else if (random < 40) questChance = 2;
-            else if (random < 60) questChance = 3;
-            else if (random < 80) questChance = 4;
-            else if (random < 95) questChance = 5;
-            else questChance = 6;
+            const randomIndex = Math.floor(Math.random() * availableQuests.length);
+            const quest = availableQuests[randomIndex];
             
-            const quest = quests.find(q => q.id === questChance);
             gameState.currentQuest = {...quest};
             gameState.questCompleted = false;
-            gameState.questTimer = 120;
+            gameState.questTimer = 120; // Сбрасываем таймер
             
             document.getElementById('get-quest-btn').disabled = true;
             updateQuestUI();
@@ -1435,6 +1452,9 @@
                 gameState.questCompleted = true;
                 updateQuestUI();
                 saveGame();
+                
+                // Показываем уведомление о выполнении квеста
+                showNotification(`Квест "${gameState.currentQuest.name}" выполнен! Нажмите "Взять квест" для получения награды.`);
             }
         }
         
@@ -1450,6 +1470,7 @@
             
             showNotification(`Квест выполнен! Получено ${reward.diamonds} алмазов`);
             
+            // Сбрасываем квест
             gameState.currentQuest = null;
             gameState.questCompleted = false;
             gameState.questTimer = 120;
