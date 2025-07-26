@@ -321,19 +321,6 @@
             margin-top: 10px;
         }
         
-        .quest-container {
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-top: 10px;
-        }
-        
-        .quest-button {
-            background-color: #9C27B0;
-            margin-top: 10px;
-        }
-        
         .event-notification {
             position: fixed;
             top: 10px;
@@ -488,15 +475,6 @@
         <div class="upgrades">
             <button onclick="buyBlock()">+1 блок (<span id="block-price">25</span>¢)</button>
             <button onclick="buyCardSlot()">+1 слотов (<span id="slot-price">5</span>¢)</button>
-        </div>
-        
-        <div class="quest-container">
-            <div class="inventory-title">
-                <span>Квесты</span>
-                <span id="quest-timer">До нового квеста: 2:00</span>
-            </div>
-            <div id="current-quest">Нет активного квеста</div>
-            <button class="quest-button" id="get-quest-btn" onclick="handleQuestButton()">Взять квест у Джона</button>
         </div>
         
         <div class="inventory">
