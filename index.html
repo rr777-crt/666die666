@@ -805,36 +805,62 @@
         // Сохранение игры
         function saveGame() {
             gameState.lastPlayTime = Date.now();
-            localStorage.setItem('cardGameSave', JSON.stringify(gameState));
+            try {
+                localStorage.setItem('cardGameSave', JSON.stringify(gameState));
+                console.log("Игра сохранена");
+            } catch (e) {
+                console.error("Ошибка сохранения:", e);
+            }
         }
         
         // Загрузка игры
         function loadGame() {
             const saved = localStorage.getItem('cardGameSave');
             if (saved) {
-                const parsed = JSON.parse(saved);
-                
-                const now = Date.now();
-                const offlineTime = now - parsed.lastPlayTime;
-                const offlineSeconds = Math.floor(offlineTime / 1000);
-                
-                if (offlineSeconds > 0 && parsed.placedCards.length > 0) {
-                    let offlineIncome = 0;
-                    parsed.placedCards.forEach(card => {
-                        if (card) offlineIncome += card.income * offlineSeconds;
-                    });
+                try {
+                    const parsed = JSON.parse(saved);
                     
-                    if (offlineIncome > 0) {
-                        parsed.money += offlineIncome;
-                        alert(`Вы получили ${offlineIncome.toFixed(2)}¢ за ${formatTime(offlineSeconds)} отсутствия!`);
+                    // Восстанавливаем только нужные поля
+                    gameState.money = parsed.money || gameState.money;
+                    gameState.diamonds = parsed.diamonds || gameState.diamonds;
+                    gameState.cards = parsed.cards || gameState.cards;
+                    gameState.placedCards = parsed.placedCards || gameState.placedCards;
+                    gameState.blocks = parsed.blocks || gameState.blocks;
+                    gameState.maxCards = parsed.maxCards || gameState.maxCards;
+                    gameState.blockPrice = parsed.blockPrice || gameState.blockPrice;
+                    gameState.slotPrice = parsed.slotPrice || gameState.slotPrice;
+                    gameState.smallPacksOpened = parsed.smallPacksOpened || gameState.smallPacksOpened;
+                    gameState.bigPacksOpened = parsed.bigPacksOpened || gameState.bigPacksOpened;
+                    gameState.ultraPacksOpened = parsed.ultraPacksOpened || gameState.ultraPacksOpened;
+                    gameState.slotsUpgraded = parsed.slotsUpgraded || gameState.slotsUpgraded;
+                    gameState.blocksUpgraded = parsed.blocksUpgraded || gameState.blocksUpgraded;
+                    gameState.rareCardsFound = parsed.rareCardsFound || gameState.rareCardsFound;
+                    gameState.mutations = parsed.mutations || gameState.mutations;
+                    gameState.currentQuest = parsed.currentQuest || gameState.currentQuest;
+                    gameState.questCompleted = parsed.questCompleted || gameState.questCompleted;
+                    gameState.questTimer = parsed.questTimer || gameState.questTimer;
+                    gameState.lastQuestUpdate = parsed.lastQuestUpdate || Date.now();
+                    
+                    // Восстанавливаем время последнего сохранения
+                    if (parsed.lastPlayTime) {
+                        const now = Date.now();
+                        const offlineTime = now - parsed.lastPlayTime;
+                        const offlineSeconds = Math.floor(offlineTime / 1000);
+                        
+                        if (offlineSeconds > 0 && gameState.placedCards.length > 0) {
+                            let offlineIncome = 0;
+                            gameState.placedCards.forEach(card => {
+                                if (card) offlineIncome += card.income * offlineSeconds;
+                            });
+                            
+                            if (offlineIncome > 0) {
+                                gameState.money += offlineIncome;
+                                showNotification(`Вы получили ${offlineIncome.toFixed(2)}¢ за ${formatTime(offlineSeconds)} отсутствия!`);
+                            }
+                        }
                     }
-                }
-                
-                gameState = parsed;
-                gameState.lastQuestUpdate = Date.now();
-                
-                if (gameState.eventActive) {
-                    endCurrentEvent();
+                } catch (e) {
+                    console.error("Ошибка загрузки сохранения:", e);
                 }
             }
         }
@@ -907,6 +933,7 @@
             const blocksContainer = document.getElementById('blocks');
             blocksContainer.innerHTML = '';
             
+            // Гарантируем, что placedCards имеет нужную длину
             while (gameState.placedCards.length < gameState.blocks) {
                 gameState.placedCards.push(null);
             }
@@ -1155,6 +1182,11 @@
         function buyPack(packType) {
             const pack = packs[packType];
             
+            if (!pack) {
+                console.error("Неизвестный тип пачки:", packType);
+                return;
+            }
+            
             if (gameState.money < pack.price) {
                 alert('Недостаточно денег!');
                 return;
@@ -1167,6 +1199,7 @@
             
             gameState.money -= pack.price;
             
+            // Увеличиваем счетчик открытых пачек
             if (packType === 'small') gameState.smallPacksOpened++;
             else if (packType === 'big') gameState.bigPacksOpened++;
             else if (packType === 'ultra') gameState.ultraPacksOpened++;
@@ -1174,6 +1207,7 @@
             updateUI();
             checkQuestCompletion();
             
+            // Генерируем случайное количество карт в пачке
             const packSize = Math.floor(Math.random() * (pack.size.max - pack.size.min + 1)) + pack.size.min;
             
             currentPack = pack;
@@ -1209,17 +1243,22 @@
             
             const packCard = document.getElementById('pack-card');
             packCard.innerHTML = '';
+            
+            // Сброс анимации
             packCard.style.animation = 'none';
-            void packCard.offsetWidth;
+            void packCard.offsetWidth; // Принудительный reflow
             packCard.style.animation = 'cardReveal 0.5s forwards';
             
+            // Получаем случайную карту
             const card = getRandomCard(currentPack.cards);
             
+            // Проверяем на редкую карту
             if (card.chance < 1) {
                 gameState.rareCardsFound++;
                 checkQuestCompletion();
             }
             
+            // Создаем элементы карты
             const nameElement = document.createElement('div');
             nameElement.textContent = card.name;
             nameElement.style.fontWeight = 'bold';
@@ -1235,15 +1274,20 @@
             incomeElement.textContent = `Доход: +${card.income}¢/сек`;
             incomeElement.style.fontSize = '14px';
             
+            // Настраиваем стиль карты в зависимости от редкости
             packCard.className = `pack-card card ${card.rarity}`;
             packCard.appendChild(nameElement);
             packCard.appendChild(rarityElement);
             packCard.appendChild(incomeElement);
             
+            // Добавляем карту в инвентарь
             gameState.cards.push(card);
             cardsOpened++;
             
+            // Обновляем информацию о пачке
             document.getElementById('pack-info').textContent = `Открываете ${getPackName(getPackType(currentPack))} пачку (осталось: ${cardsToOpen - cardsOpened} карт)`;
+            
+            // Обновляем интерфейс и сохраняем игру
             updateUI();
             saveGame();
         }
