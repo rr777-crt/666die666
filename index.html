@@ -6,549 +6,513 @@
     <title>Карточная Игра</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+            background-color: #f5f5f5;
             color: #333;
         }
         
-        .container {
+        .game-container {
             display: flex;
             flex-direction: column;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            gap: 10px;
         }
         
-        .header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .stats {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-        
-        .resources {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .resource {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .main-content {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .game-area {
-            flex: 3;
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 16px;
         }
         
-        .blocks-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+        .blocks {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
         }
         
         .block {
-            height: 200px;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
+            width: 100px;
+            height: 100px;
+            background-color: #ddd;
+            border-radius: 5px;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 24px;
             cursor: pointer;
-            transition: all 0.3s;
             position: relative;
-            background-color: #f9f9f9;
-        }
-        
-        .block:hover {
-            border-color: #3498db;
-        }
-        
-        .block.active {
-            border-color: #2ecc71;
+            overflow: hidden;
         }
         
         .card {
-            width: 140px;
-            height: 190px;
-            border-radius: 8px;
-            background-color: #fff;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            transition: transform 0.3s;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .card-header {
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .card-body {
-            flex: 1;
+            width: 90%;
+            height: 90%;
+            background-color: white;
+            border-radius: 5px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 10px;
-        }
-        
-        .card-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .card-footer {
-            padding: 8px;
             text-align: center;
-            font-size: 12px;
-            background-color: #f5f5f5;
+            padding: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 14px;
+        }
+        
+        .card.common {
+            border: 2px solid #ccc;
+            color: #333;
+        }
+        
+        .card.rare {
+            border: 2px solid #4da6ff;
+            background-color: #e6f2ff;
+            color: #003366;
+        }
+        
+        .card.epic {
+            border: 2px solid #b366ff;
+            background-color: #f0e6ff;
+            color: #4d0066;
+        }
+        
+        .card.legendary {
+            border: 2px solid #ff9900;
+            background-color: #fff2cc;
+            color: #663300;
+        }
+
+        .card.mythic {
+            border: 2px solid #ff9900;
+            background-color: red;
+            color: #763300;
+        }
+        
+        .card.divine {
+            background: linear-gradient(45deg, #ff0000, #ff9900, #33cc33, #0099ff, #9933ff);
+            background-size: 400% 400%;
+            animation: rainbow 5s ease infinite;
+            border: 2px solid gold;
+            color: white;
+            text-shadow: 0 0 3px black;
+        }
+        
+        .card.secret {
+            border: 2px solid #ff9900;
+            background-color: black;
+            color: white;
         }
         
         .card.golden {
-            background: linear-gradient(135deg, #ffd700, #daa520);
+            background: linear-gradient(45deg, #ffd700, #daa520, #ffd700);
+            background-size: 200% 200%;
+            animation: shine 2s ease infinite;
+            border: 2px solid #ffd700;
+            color: #333;
         }
         
-        .card.diamond {
-            background: linear-gradient(135deg, #b9f2ff, #7ec0ee);
+        .card.wet {
+            background-color: #add8e6;
+            border: 2px solid #1e90ff;
+            color: #00008b;
         }
         
-        .sidebar {
-            flex: 1;
+        .card.icy {
+            background-color: #e6f7ff;
+            border: 2px solid #00bfff;
+            color: #003366;
+        }
+        
+        .card.electric {
+            background-color: #fffacd;
+            border: 2px solid #ffd700;
+            color: #ff4500;
+            animation: electric 0.5s infinite alternate;
+        }
+        
+        @keyframes rainbow {
+            0% {background-position: 0% 50%}
+            50% {background-position: 100% 50%}
+            100% {background-position: 0% 50%}
+        }
+        
+        @keyframes shine {
+            0% {background-position: 0% 50%}
+            100% {background-position: 100% 50%}
+        }
+        
+        @keyframes electric {
+            from {box-shadow: 0 0 5px #ffd700;}
+            to {box-shadow: 0 0 20px #ffd700, 0 0 30px #ff4500;}
+        }
+        
+        .pack-buttons {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
-        .panel {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .panel-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-        }
-        
-        .btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
+        button {
             padding: 10px 15px;
+            border: none;
             border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            flex-grow: 1;
             font-size: 14px;
-            margin-bottom: 10px;
-            width: 100%;
         }
         
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .btn:disabled {
-            background-color: #95a5a6;
+        button:disabled {
+            background-color: #cccccc;
             cursor: not-allowed;
         }
         
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 12px;
-            width: auto;
-        }
-        
         .inventory {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 5px;
-        }
-        
-        .inventory-item {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-        
-        .inventory-item:hover {
-            background-color: #f0f0f0;
-            transform: scale(1.05);
-        }
-        
-        .quest-panel {
-            margin-top: 20px;
-        }
-        
-        .quest {
-            background-color: #f8f9fa;
-            border-left: 4px solid #3498db;
+            background-color: #fff;
             padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 0 5px 5px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
         }
         
-        .quest-title {
-            font-weight: bold;
+        .inventory-title {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 5px;
+            font-size: 16px;
         }
         
-        .quest-progress {
-            height: 5px;
-            background-color: #eee;
-            border-radius: 5px;
-            margin: 5px 0;
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 5px;
         }
         
-        .quest-progress-bar {
-            height: 100%;
-            background-color: #2ecc71;
-            border-radius: 5px;
+        .inventory-card {
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            word-break: break-word;
+            position: relative;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .inventory-card.selected {
+            border: 2px solid green;
+        }
+        
+        .inventory-card.selling {
+            transform: scale(0.95);
+            opacity: 0.8;
+            border: 2px dashed red;
+        }
+        
+        .hold-timer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 0%;
-        }
-        
-        .quest-reward {
-            font-size: 12px;
-            color: #27ae60;
-            font-weight: bold;
-        }
-        
-        .quest-timer {
-            font-size: 12px;
-            color: #7f8c8d;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #2ecc71;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .notification.show {
-            opacity: 1;
+            height: 3px;
+            background-color: #ff5722;
+            transition: width 1s linear;
         }
         
         .upgrades {
             display: flex;
-            flex-direction: column;
             gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
         }
         
-        .upgrade {
+        .pack-opening {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 10px;
-            background-color: #f8f9fa;
+            z-index: 100;
+            color: white;
+        }
+        
+        .pack-card {
+            width: 70%;
+            max-width: 300px;
+            height: 200px;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            transform: scale(0);
+            animation: cardReveal 0.5s forwards;
+            color: #333;
+        }
+        
+        @keyframes cardReveal {
+            to { transform: scale(1); }
+        }
+        
+        .pack-info {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .continue-btn {
+            background-color: #4CAF50;
+            padding: 10px 20px;
             border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
         }
         
-        .upgrade-info {
-            flex: 1;
+        .placed-card {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            cursor: pointer;
         }
         
-        .upgrade-title {
+        .shop-toggle {
+            margin-top: 10px;
+            background-color: #2196F3;
+        }
+        
+        .shop-container {
+            display: none;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+        
+        .diamond-shop-toggle {
+            margin-top: 10px;
+            background-color: #FF9800;
+        }
+        
+        .diamond-shop-container {
+            display: none;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+        
+        .event-notification {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 200;
+            animation: fadeInOut 3s forwards;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; top: -50px; }
+            10% { opacity: 1; top: 10px; }
+            90% { opacity: 1; top: 10px; }
+            100% { opacity: 0; top: -50px; }
+        }
+        
+        .mutation-icon {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
             font-weight: bold;
         }
         
-        .upgrade-desc {
-            font-size: 12px;
-            color: #7f8c8d;
+        .golden-mutation {
+            background-color: gold;
+            color: black;
         }
         
-        .basement {
+        .diamond-mutation {
+            background-color: #00bfff;
+            color: white;
+        }
+        
+        .wet-mutation {
+            background-color: #1e90ff;
+            color: white;
+        }
+        
+        .icy-mutation {
+            background-color: #87ceeb;
+            color: white;
+        }
+        
+        .electric-mutation {
+            background-color: #ffd700;
+            color: #ff4500;
+        }
+        
+        footer {
             margin-top: 20px;
-            padding: 15px;
-            background-color: #34495e;
-            border-radius: 8px;
-            color: white;
-        }
-        
-        .basement-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #2c3e50;
-            padding-bottom: 8px;
-        }
-        
-        .mutations {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .mutation {
-            flex: 1;
-            background-color: #2c3e50;
             padding: 10px;
+            background-color: #fff;
             border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .mutation:hover {
-            background-color: #1a252f;
-        }
-        
-        .mutation.active {
-            background-color: #16a085;
-        }
-        
-        .event-banner {
-            background-color: #e74c3c;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            margin-bottom: 15px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .tooltip {
-            position: absolute;
-            background-color: #333;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             font-size: 12px;
-            z-index: 100;
+            text-align: center;
+        }
+        
+        .weather-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-            max-width: 200px;
+            z-index: 50;
+            opacity: 0.3;
+        }
+        
+        .rain-effect {
+            background: linear-gradient(transparent, rgba(0, 0, 255, 0.1));
+            animation: rain 0.5s linear infinite;
+        }
+        
+        .snow-effect {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 2"><circle cx="1" cy="1" r="1" fill="white"/></svg>');
+            animation: snow 5s linear infinite;
+        }
+        
+        .thunder-effect {
+            animation: thunder 5s linear infinite;
+        }
+        
+        @keyframes rain {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 20px; }
+        }
+        
+        @keyframes snow {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+        
+        @keyframes thunder {
+            0%, 100% { background-color: transparent; }
+            1% { background-color: rgba(255, 255, 255, 0.7); }
+            2% { background-color: transparent; }
+            3% { background-color: rgba(255, 255, 255, 0.5); }
+            4% { background-color: transparent; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Карточная Игра</h1>
-            <div class="resources">
-                <div class="resource">
-                    <span>💰</span>
-                    <span id="money">0</span>¢
-                </div>
-                <div class="resource">
-                    <span>💎</span>
-                    <span id="diamonds">0</span>
-                </div>
+    <div class="game-container">
+        <div class="stats">
+            <div>Монеты: <span id="money">15</span>¢</div>
+            <div>Алмазы: <span id="diamonds">0</span>♦</div>
+            <div>Карты: <span id="total-cards">0</span>/<span id="max-cards">15</span></div>
+        </div>
+        
+        <div class="blocks" id="blocks">
+            <!-- Блоки будут добавлены динамически -->
+        </div>
+        
+        <button class="shop-toggle" id="shop-toggle" onclick="toggleShop()">Показать магазин пачек</button>
+        
+        <div class="shop-container" id="shop-container">
+            <div class="pack-buttons">
+                <button id="small-pack" onclick="buyPack('small')">Маленькая пачка (5¢)</button>
+                <button id="big-pack" onclick="buyPack('big')">Большая пачка (50¢)</button>
+                <button id="premium-pack" onclick="buyPack('premium')">Премиум пачка (500¢)</button>
+                <button id="ultra-pack" onclick="buyPack('ultra')">Ультра пачка (50000¢)</button>
+                <button id="omega-pack" onclick="buyPack('omega')">ОМЕГА пачка (4000000¢)</button>
+                <button id="ruby-pack" onclick="buyPack('ruby')">Рубиновая пачка (45000000¢)</button>
+                <button id="ppp-pack" onclick="buyPack('ppp')">СЕКРЕТНАЯ пачка (1000000000¢)</button>
             </div>
         </div>
         
-        <div class="main-content">
-            <div class="game-area">
-                <h2>Игровое поле</h2>
-                <div class="blocks-container" id="blocks-container"></div>
-                
-                <div class="actions">
-                    <button id="buy-block-btn" class="btn">Купить блок (+1) - <span id="block-price">25</span>¢</button>
-                    <button id="buy-slot-btn" class="btn">Увеличить инвентарь (+5) - <span id="slot-price">5</span>¢</button>
-                </div>
-                
-                <div class="basement">
-                    <div class="basement-title">Подвал (Квесты)</div>
-                    <div id="quest-container"></div>
-                </div>
+        <button class="diamond-shop-toggle" id="diamond-shop-toggle" onclick="toggleDiamondShop()">Показать магазин алмазов</button>
+        
+        <div class="diamond-shop-container" id="diamond-shop-container">
+            <div class="pack-buttons">
+                <button onclick="buyMutation('golden')">Золотая мутация (10♦)</button>
+                <button onclick="buyMutation('diamond')">Алмазная мутация (35♦)</button>
+                <button onclick="buyUpgrade('slots')">+2 слота (5♦)</button>
+                <button onclick="buyUpgrade('blocks')">+2 блока (10♦)</button>
             </div>
-            
-            <div class="sidebar">
-                <div class="panel">
-                    <div class="panel-title">Магазин</div>
-                    <button id="small-pack-btn" class="btn">Малый набор (3 карты) - 10¢</button>
-                    <button id="big-pack-btn" class="btn">Большой набор (5 карт) - 25¢</button>
-                    <button id="ultra-pack-btn" class="btn">Ультра набор (8 карт) - 50¢</button>
-                </div>
-                
-                <div class="panel">
-                    <div class="panel-title">Инвентарь (<span id="inventory-count">0</span>/<span id="max-cards">15</span>)</div>
-                    <div class="inventory" id="inventory"></div>
-                </div>
-                
-                <div class="panel">
-                    <div class="panel-title">Мутации</div>
-                    <div class="mutations">
-                        <div class="mutation" id="golden-mutation">
-                            <div>Золотая</div>
-                            <div id="golden-count">0</div>
-                        </div>
-                        <div class="mutation" id="diamond-mutation">
-                            <div>Алмазная</div>
-                            <div id="diamond-count">0</div>
-                        </div>
-                    </div>
-                </div>
+        </div>
+        
+        <div class="upgrades">
+            <button onclick="buyBlock()">+1 блок (<span id="block-price">25</span>¢)</button>
+            <button onclick="buyCardSlot()">+1 слотов (<span id="slot-price">5</span>¢)</button>
+        </div>
+        
+        <div class="inventory">
+            <div class="inventory-title">
+                <span>Инвентарь</span>
+                <span id="selected-card-name"></span>
+            </div>
+            <div class="cards-grid" id="inventory">
+                <!-- Карты будут добавлены динамически -->
             </div>
         </div>
     </div>
     
-    <div class="notification" id="notification"></div>
-    <div class="tooltip" id="tooltip"></div>
+    <div class="pack-opening" id="pack-opening" style="display: none;">
+        <div class="pack-info" id="pack-info">Открываете маленькую пачку (осталось: 4 карт)</div>
+        <div class="pack-card" id="pack-card">
+            <!-- Карта будет добавлена динамически -->
+        </div>
+        <div class="continue-btn" onclick="continueOpening()">Продолжить</div>
+    </div>
+    
+    <div id="weather-effect" class="weather-effect" style="display: none;"></div>
+    
+    <footer>
+        <div class="quest-container">
+            <div class="inventory-title">
+                <span>Квесты</span>
+                <span id="quest-timer">До нового квеста: 2:00</span>
+            </div>
+            <div id="current-quest">Нет активного квеста</div>
+            <button class="quest-button" id="get-quest-btn" onclick="handleQuestButton()">Взять квест у Джона</button>
+        </div>
+        <p>ОБНОВЛЕНИЕ КАЖДАЯ ПЯТНИЦА:</p>
+        <p>18:00, новая версия: 1.1</p>
+        <p>ОБНОВЛЕНИЕ ИНФО: хэй!хочешь награды? тебе нужно сделать...</p>
+    </footer>
     
     <script>
-        // Константы игры
-        const CARD_TYPES = [
-            { name: "Медь", value: 0.1, color: "#b87333", rarity: 0 },
-            { name: "Серебро", value: 0.5, color: "#c0c0c0", rarity: 1 },
-            { name: "Золото", value: 2, color: "#ffd700", rarity: 2 },
-            { name: "Платина", value: 5, color: "#e5e4e2", rarity: 3 },
-            { name: "Кристалл", value: 10, color: "#a7d8de", rarity: 4 },
-            { name: "Рубин", value: 25, color: "#e0115f", rarity: 5 },
-            { name: "Алмаз", value: 50, color: "#b9f2ff", rarity: 6 }
-        ];
-        
-        const QUEST_TYPES = [
-            {
-                name: "Новичок",
-                description: "Получите 50¢ с карт",
-                target: 50,
-                reward: { money: 10, diamonds: 0 },
-                rarity: 0
-            },
-            {
-                name: "Коллекционер",
-                description: "Соберите 10 карт в инвентаре",
-                target: 10,
-                reward: { money: 15, diamonds: 1 },
-                rarity: 1
-            },
-            {
-                name: "Инвестор",
-                description: "Заработайте 200¢ с карт",
-                target: 200,
-                reward: { money: 30, diamonds: 2 },
-                rarity: 2
-            },
-            {
-                name: "Богач",
-                description: "Получите 500¢ с карт",
-                target: 500,
-                reward: { money: 50, diamonds: 5 },
-                rarity: 3
-            },
-            {
-                name: "Карточный магнат",
-                description: "Соберите 25 карт в инвентаре",
-                target: 25,
-                reward: { money: 75, diamonds: 8 },
-                rarity: 4
-            },
-            {
-                name: "Легенда",
-                description: "Заработайте 1000¢ с карт",
-                target: 1000,
-                reward: { money: 100, diamonds: 15 },
-                rarity: 5
-            }
-        ];
-        
-        const MUTATIONS = {
-            golden: {
-                name: "Золотая мутация",
-                description: "Увеличивает доход карт на 50%",
-                cost: 10,
-                effect: (card) => {
-                    card.income *= 1.5;
-                    card.type = "golden";
-                }
-            },
-            diamond: {
-                name: "Алмазная мутация",
-                description: "Увеличивает доход карт на 150%",
-                cost: 25,
-                effect: (card) => {
-                    card.income *= 2.5;
-                    card.type = "diamond";
-                }
-            }
-        };
-        
-        const EVENTS = [
-            {
-                name: "Золотая лихорадка",
-                description: "Все карты приносят в 2 раза больше дохода в течение 5 минут!",
-                duration: 300,
-                effect: () => {
-                    gameState.eventMultiplier = 2;
-                },
-                endEffect: () => {
-                    gameState.eventMultiplier = 1;
-                }
-            },
-            {
-                name: "Удача новичка",
-                description: "Шанс получить редкие карты увеличен на 20% в течение 5 минут!",
-                duration: 300,
-                effect: () => {
-                    gameState.eventLuck = 0.2;
-                },
-                endEffect: () => {
-                    gameState.eventLuck = 0;
-                }
-            },
-            {
-                name: "Бонусный час",
-                description: "Все награды за квесты увеличены на 50% в течение 5 минут!",
-                duration: 300,
-                effect: () => {
-                    gameState.questBonus = 1.5;
-                },
-                endEffect: () => {
-                    gameState.questBonus = 1;
-                }
-            }
-        ];
-
         // Игровые данные
         let gameState = {
             money: 15,
@@ -572,600 +536,770 @@
             },
             activeMutations: {},
             currentQuest: null,
-            questProgress: 0,
             questCompleted: false,
             questTimer: 120,
-            totalEarned: 0,
-            totalCardsCollected: 0,
             eventActive: null,
             eventTimer: null,
-            eventMultiplier: 1,
-            eventLuck: 0,
-            questBonus: 1,
+            eventIntervalId: null,
             lastQuestUpdate: Date.now()
         };
+        
+        let selectedCard = null;
+        let currentPack = null;
+        let cardsToOpen = 0;
+        let cardsOpened = 0;
+        let holdTimers = {};
+        let tapStartTime = 0;
+        let isSelling = false;
+        let sellingCardIndex = null;
+        let isShopOpen = false;
+        let isDiamondShopOpen = false;
+        let selectedMutation = null;
+        let mutationApplying = false;
 
-        // DOM элементы
-        const elements = {
-            money: document.getElementById('money'),
-            diamonds: document.getElementById('diamonds'),
-            blocksContainer: document.getElementById('blocks-container'),
-            inventory: document.getElementById('inventory'),
-            inventoryCount: document.getElementById('inventory-count'),
-            maxCards: document.getElementById('max-cards'),
-            smallPackBtn: document.getElementById('small-pack-btn'),
-            bigPackBtn: document.getElementById('big-pack-btn'),
-            ultraPackBtn: document.getElementById('ultra-pack-btn'),
-            buyBlockBtn: document.getElementById('buy-block-btn'),
-            buySlotBtn: document.getElementById('buy-slot-btn'),
-            blockPrice: document.getElementById('block-price'),
-            slotPrice: document.getElementById('slot-price'),
-            goldenMutation: document.getElementById('golden-mutation'),
-            diamondMutation: document.getElementById('diamond-mutation'),
-            goldenCount: document.getElementById('golden-count'),
-            diamondCount: document.getElementById('diamond-count'),
-            questContainer: document.getElementById('quest-container'),
-            notification: document.getElementById('notification'),
-            tooltip: document.getElementById('tooltip')
+        // Цены продажи карт
+        const sellPrices = {
+            common: 1,
+            rare: 3,
+            epic: 10,
+            legendary: 40,
+            mythic: 200,
+            divine: 40000,
+            secret: 100000
         };
+        
+        // Карточные пачки
+        const packs = {
+            small: {
+                price: 5,
+                size: { min: 4, max: 6 },
+                cards: [
+                    { name: "Blockman Go!", chance: 50, rarity: "common", income: 0.01 },
+                    { name: "Soul Knight", chance: 35, rarity: "common", income: 0.03 },
+                    { name: "Baldi's Basic Classics", chance: 10.5, rarity: "rare", income: 0.07 },
+                    { name: "Roblox", chance: 4, rarity: "rare", income: 0.1 },
+                    { name: "Cookie Clicker", chance: 0.5, rarity: "epic", income: 0.8 }
+                ]
+            },
+            big: {
+                price: 50,
+                size: { min: 4, max: 6 },
+                cards: [
+                    { name: "Baldi's Basic Classics", chance: 40, rarity: "rare", income: 0.07 },
+                    { name: "Roblox", chance: 30, rarity: "rare", income: 0.1 },
+                    { name: "Dead Cells", chance: 20, rarity: "rare", income: 0.3 },
+                    { name: "Cookie Clicker", chance: 9, rarity: "epic", income: 0.8 },
+                    { name: "Bandi", chance: 1, rarity: "epic", income: 1.2 }
+                ]
+            },
+            premium: {
+                price: 500,
+                size: { min: 4, max: 6 },
+                cards: [
+                    { name: "Bandi", chance: 50, rarity: "epic", income: 1.2 },
+                    { name: "Terraria", chance: 30, rarity: "epic", income: 2 },
+                    { name: "FL Studio", chance: 17, rarity: "epic", income: 2.5 },
+                    { name: "ULTRAKILL", chance: 2.55, rarity: "legendary", income: 3.25 },
+                    { name: "GitHub", chance: 0.5, rarity: "legendary", income: 5 },
+                    { name: "MINECRAFT", chance: 0.05, rarity: "divine", income: 100 }
+                ]
+            },
+            ultra: {
+                price: 50000,
+                size: { min: 5, max: 7 },
+                cards: [
+                    { name: "ULTRAKILL", chance: 40, rarity: "legendary", income: 3.25 },
+                    { name: "Nothing", chance: 20, rarity: "legendary", income: 3.75 },
+                    { name: "Ball", chance: 15, rarity: "legendary", income: 4.1 },
+                    { name: "GitHub", chance: 10, rarity: "legendary", income: 5 },
+                    { name: "GeometryDash", chance: 7, rarity: "legendary", income: 7 },
+                    { name: "HollowKnight", chance: 6, rarity: "mythic", income: 15 },
+                    { name: "Genshin", chance: 1.5, rarity: "mythic", income: 20 },
+                    { name: "MINECRAFT", chance: 0.5, rarity: "divine", income: 100 }
+                ]
+            },
+            omega: {
+                price: 4000000,
+                size: { min: 2, max: 5 },
+                cards: [
+                    { name: "GeometryDash", chance: 70, rarity: "legendary", income: 7 },
+                    { name: "Genshin", chance: 25, rarity: "mythic", income: 20 },
+                    { name: "MINECRAFT", chance: 4.4, rarity: "divine", income: 100 },
+                    { name: "FNAF", chance: 0.6, rarity: "divine", income: 300 }
+                ]
+            },
+            ruby: {
+                price: 45000000,
+                size: { min: 4, max: 7 },
+                cards: [
+                    { name: "stickman War", chance: 60, rarity: "mythic", income: 17.5 },
+                    { name: "Genshin", chance: 35, rarity: "mythic", income: 20 },
+                    { name: "BreawlStars", chance: 4.1, rarity: "mythic", income: 33 },
+                    { name: "MySingingMonsters", chance: 0.9, rarity: "divine", income: 275 },
+                ]
+            },
+            ppp: {
+                price: 1000000000,
+                size: { min: 1, max: 10 },
+                cards: [
+                    { name: "MINECRAFT", chance: 50, rarity: "divine", income: 100 },
+                    { name: "PACKMAN", chance: 35, rarity: "divine", income: 200 },
+                    { name: "???", chance: 10, rarity: "secret", income: 1000 },
+                    { name: "UNDERTAL", chance: 4.98, rarity: "secret", income: 2000 },
+                    { name: "AI", chance: 0.1, rarity: "secret", income: 10000 },
+                    { name: "GOD", chance: 0.01, rarity: "secret", income: 100000 }
+                ]
+            }
+        };
+        
+        // Квесты
+        const quests = [
+            {
+                id: 1,
+                name: "Открыть 5 маленьких пачек",
+                description: "Откройте 5 маленьких пачек карт",
+                condition: (state) => state.smallPacksOpened >= 5,
+                progress: (state) => `Прогресс: ${state.smallPacksOpened}/5`,
+                reward: { diamonds: 5 }
+            },
+            {
+                id: 2,
+                name: "Открыть 3 больших пачки",
+                description: "Откройте 3 больших пачки карт",
+                condition: (state) => state.bigPacksOpened >= 3,
+                progress: (state) => `Прогресс: ${state.bigPacksOpened}/3`,
+                reward: { diamonds: 6 }
+            },
+            {
+                id: 3,
+                name: "Открыть 2 ультра пачки",
+                description: "Откройте 2 ультра пачки карт",
+                condition: (state) => state.ultraPacksOpened >= 2,
+                progress: (state) => `Прогресс: ${state.ultraPacksOpened}/2`,
+                reward: { diamonds: 10 }
+            },
+            {
+                id: 4,
+                name: "Прокачать 5 слотов",
+                description: "Увеличьте количество слотов 5 раз",
+                condition: (state) => state.slotsUpgraded >= 5,
+                progress: (state) => `Прогресс: ${state.slotsUpgraded}/5`,
+                reward: { diamonds: 7 }
+            },
+            {
+                id: 5,
+                name: "Добавить 3 блока",
+                description: "Увеличьте количество блоков 3 раза",
+                condition: (state) => state.blocksUpgraded >= 3,
+                progress: (state) => `Прогресс: ${state.blocksUpgraded}/3`,
+                reward: { diamonds: 10 }
+            },
+            {
+                id: 6,
+                name: "Найти редкую карту",
+                description: "Выбить карту с шансом менее 1%",
+                condition: (state) => state.rareCardsFound >= 1,
+                progress: (state) => `Прогресс: ${state.rareCardsFound}/1`,
+                reward: { diamonds: 15 }
+            }
+        ];
+        
+        // События
+        const events = [
+            {
+                id: 'nothing',
+                name: "Ничего не происходит",
+                chance: 50,
+                duration: 60,
+                effect: () => {},
+                endEffect: () => {},
+                effectClass: '',
+                color: '#333'
+            },
+            {
+                id: 'rain',
+                name: "Дождь",
+                chance: 30,
+                duration: 60,
+                interval: 20,
+                effect: (card) => {
+                    if (!card.originalIncome) card.originalIncome = card.income;
+                    card.income = card.originalIncome * 2;
+                    card.mutation = 'wet';
+                    card.tempMutation = 'rain';
+                },
+                endEffect: (card) => {
+                    if (card.tempMutation === 'rain') {
+                        card.income = card.originalIncome;
+                        delete card.originalIncome;
+                        delete card.mutation;
+                        delete card.tempMutation;
+                    }
+                },
+                effectClass: 'rain-effect',
+                color: '#1e90ff'
+            },
+            {
+                id: 'snowstorm',
+                name: "Метель",
+                chance: 15,
+                duration: 60,
+                interval: 15,
+                effect: (card) => {
+                    if (!card.originalIncome) card.originalIncome = card.income;
+                    card.income = card.originalIncome * 3;
+                    card.mutation = 'icy';
+                    card.tempMutation = 'snowstorm';
+                },
+                endEffect: (card) => {
+                    if (card.tempMutation === 'snowstorm') {
+                        card.income = card.originalIncome;
+                        delete card.originalIncome;
+                        delete card.mutation;
+                        delete card.tempMutation;
+                    }
+                },
+                effectClass: 'snow-effect',
+                color: '#87ceeb'
+            },
+            {
+                id: 'thunderstorm',
+                name: "Гроза",
+                chance: 5,
+                duration: 60,
+                interval: 10,
+                effect: (card) => {
+                    if (!card.originalIncome) card.originalIncome = card.income;
+                    card.income = card.originalIncome * 5;
+                    card.mutation = 'electric';
+                    card.tempMutation = 'thunderstorm';
+                },
+                endEffect: (card) => {
+                    if (card.tempMutation === 'thunderstorm') {
+                        card.income = card.originalIncome;
+                        delete card.originalIncome;
+                        delete card.mutation;
+                        delete card.tempMutation;
+                    }
+                },
+                effectClass: 'thunder-effect',
+                color: '#ffd700'
+            }
+        ];
 
         // Инициализация игры
         function initGame() {
             loadGame();
-            
-            // Проверка и инициализация placedCards
-            if (!Array.isArray(gameState.placedCards)) {
-                gameState.placedCards = [];
-            }
-            
-            // Заполняем null до количества блоков
-            while (gameState.placedCards.length < gameState.blocks) {
-                gameState.placedCards.push(null);
-            }
-            
-            // Удаляем лишние карты, если блоков стало меньше
-            if (gameState.placedCards.length > gameState.blocks) {
-                const removedCards = gameState.placedCards.splice(gameState.blocks);
-                gameState.cards = gameState.cards.concat(removedCards.filter(card => card !== null));
-            }
-            
-            // Проверка квеста
-            if (!gameState.currentQuest && gameState.questTimer <= 0) {
-                generateNewQuest();
-            }
-            
-            // Обновляем интерфейс
             updateUI();
             renderBlocks();
             renderInventory();
-            updateQuestUI();
             
-            // Настройка интервалов
             setInterval(passiveIncome, 1000);
             setInterval(saveGame, 30000);
             setInterval(updateQuestTimer, 1000);
             setInterval(checkForRandomEvent, 60000);
             
-            // Настройка обработчиков событий
-            setupEventListeners();
-            
-            // Показываем уведомление о загрузке
-            showNotification("Игра загружена!");
+            window.addEventListener('beforeunload', saveGame);
         }
-
-        // Настройка обработчиков событий
-        function setupEventListeners() {
-            elements.smallPackBtn.addEventListener('click', () => buyCardPack(3, 10));
-            elements.bigPackBtn.addEventListener('click', () => buyCardPack(5, 25));
-            elements.ultraPackBtn.addEventListener('click', () => buyCardPack(8, 50));
-            
-            elements.buyBlockBtn.addEventListener('click', buyBlock);
-            elements.buySlotBtn.addEventListener('click', buySlot);
-            
-            elements.goldenMutation.addEventListener('click', () => activateMutation('golden'));
-            elements.diamondMutation.addEventListener('click', () => activateMutation('diamond'));
-            
-            // Обработчик для tooltip
-            document.addEventListener('mousemove', (e) => {
-                elements.tooltip.style.left = `${e.pageX + 10}px`;
-                elements.tooltip.style.top = `${e.pageY + 10}px`;
-            });
-        }
-
-        // Загрузка игры
-        function loadGame() {
-            const saved = localStorage.getItem('cardGameSave');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    
-                    // Восстанавливаем основные параметры
-                    gameState.money = parsed.money || 15;
-                    gameState.diamonds = parsed.diamonds || 0;
-                    gameState.blocks = parsed.blocks || 3;
-                    gameState.maxCards = parsed.maxCards || 15;
-                    gameState.blockPrice = parsed.blockPrice || 25;
-                    gameState.slotPrice = parsed.slotPrice || 5;
-                    gameState.smallPacksOpened = parsed.smallPacksOpened || 0;
-                    gameState.bigPacksOpened = parsed.bigPacksOpened || 0;
-                    gameState.ultraPacksOpened = parsed.ultraPacksOpened || 0;
-                    gameState.slotsUpgraded = parsed.slotsUpgraded || 0;
-                    gameState.blocksUpgraded = parsed.blocksUpgraded || 0;
-                    gameState.rareCardsFound = parsed.rareCardsFound || 0;
-                    gameState.totalEarned = parsed.totalEarned || 0;
-                    gameState.totalCardsCollected = parsed.totalCardsCollected || 0;
-                    gameState.lastPlayTime = parsed.lastPlayTime || Date.now();
-                    gameState.lastQuestUpdate = parsed.lastQuestUpdate || Date.now();
-                    
-                    // Восстанавливаем карты
-                    if (parsed.cards && Array.isArray(parsed.cards)) {
-                        gameState.cards = parsed.cards;
-                    } else {
-                        gameState.cards = [];
-                    }
-                    
-                    // Восстанавливаем размещенные карты
-                    if (parsed.placedCards && Array.isArray(parsed.placedCards)) {
-                        gameState.placedCards = parsed.placedCards;
-                    } else {
-                        gameState.placedCards = [];
-                    }
-                    
-                    // Восстанавливаем мутации
-                    if (parsed.mutations) {
-                        gameState.mutations = parsed.mutations;
-                    } else {
-                        gameState.mutations = { golden: 0, diamond: 0 };
-                    }
-                    
-                    // Восстанавливаем активные мутации
-                    if (parsed.activeMutations) {
-                        gameState.activeMutations = parsed.activeMutations;
-                    } else {
-                        gameState.activeMutations = {};
-                    }
-                    
-                    // Восстанавливаем квест
-                    if (parsed.currentQuest) {
-                        gameState.currentQuest = parsed.currentQuest;
-                        gameState.questProgress = parsed.questProgress || 0;
-                        gameState.questCompleted = parsed.questCompleted || false;
-                        gameState.questTimer = parsed.questTimer || 120;
-                    }
-                    
-                    // Восстанавливаем событие
-                    if (parsed.eventActive) {
-                        gameState.eventActive = parsed.eventActive;
-                        gameState.eventTimer = parsed.eventTimer;
-                        startEvent(gameState.eventActive);
-                    }
-                    
-                    // Проверяем оффлайн доход
-                    const now = Date.now();
-                    const offlineTime = Math.min(now - gameState.lastPlayTime, 86400000); // Максимум 24 часа
-                    const offlineSeconds = Math.floor(offlineTime / 1000);
-                    
-                    if (offlineSeconds > 0 && gameState.placedCards.some(card => card !== null)) {
-                        let offlineIncome = 0;
-                        gameState.placedCards.forEach(card => {
-                            if (card) {
-                                const income = card.income * offlineSeconds * (gameState.eventMultiplier || 1);
-                                offlineIncome += income;
-                                card.totalEarned += income;
-                                gameState.totalEarned += income;
-                            }
-                        });
-                        
-                        if (offlineIncome > 0) {
-                            gameState.money += offlineIncome;
-                            showNotification(`Вы получили ${offlineIncome.toFixed(2)}¢ за ${formatTime(offlineSeconds)} отсутствия!`);
-                        }
-                        
-                        // Обновляем прогресс квеста
-                        updateQuestProgress('earn', offlineIncome);
-                    }
-                    
-                } catch (e) {
-                    console.error("Ошибка загрузки сохранения:", e);
-                    resetGame();
-                }
-            } else {
-                resetGame();
-            }
-        }
-
-        // Сброс игры
-        function resetGame() {
-            gameState = {
-                money: 15,
-                diamonds: 0,
-                cards: [],
-                placedCards: [],
-                blocks: 3,
-                maxCards: 15,
-                blockPrice: 25,
-                slotPrice: 5,
-                lastPlayTime: Date.now(),
-                smallPacksOpened: 0,
-                bigPacksOpened: 0,
-                ultraPacksOpened: 0,
-                slotsUpgraded: 0,
-                blocksUpgraded: 0,
-                rareCardsFound: 0,
-                mutations: {
-                    golden: 0,
-                    diamond: 0
-                },
-                activeMutations: {},
-                currentQuest: null,
-                questProgress: 0,
-                questCompleted: false,
-                questTimer: 120,
-                totalEarned: 0,
-                totalCardsCollected: 0,
-                eventActive: null,
-                eventTimer: null,
-                eventMultiplier: 1,
-                eventLuck: 0,
-                questBonus: 1,
-                lastQuestUpdate: Date.now()
-            };
-            
-            // Заполняем placedCards
-            for (let i = 0; i < gameState.blocks; i++) {
-                gameState.placedCards.push(null);
-            }
-            
-            generateNewQuest();
-            saveGame();
-        }
-
+        
         // Сохранение игры
         function saveGame() {
             gameState.lastPlayTime = Date.now();
             localStorage.setItem('cardGameSave', JSON.stringify(gameState));
         }
-
+        
+        // Загрузка игры
+        function loadGame() {
+            const saved = localStorage.getItem('cardGameSave');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                
+                const now = Date.now();
+                const offlineTime = now - parsed.lastPlayTime;
+                const offlineSeconds = Math.floor(offlineTime / 1000);
+                
+                if (offlineSeconds > 0 && parsed.placedCards.length > 0) {
+                    let offlineIncome = 0;
+                    parsed.placedCards.forEach(card => {
+                        if (card) offlineIncome += card.income * offlineSeconds;
+                    });
+                    
+                    if (offlineIncome > 0) {
+                        parsed.money += offlineIncome;
+                        alert(`Вы получили ${offlineIncome.toFixed(2)}¢ за ${formatTime(offlineSeconds)} отсутствия!`);
+                    }
+                }
+                
+                gameState = parsed;
+                gameState.lastQuestUpdate = Date.now();
+                
+                if (gameState.eventActive) {
+                    endCurrentEvent();
+                }
+            }
+        }
+        
+        // Форматирование времени
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            return [
+                hours > 0 ? `${hours}ч` : '',
+                minutes > 0 ? `${minutes}м` : '',
+                `${secs}с`
+            ].filter(Boolean).join(' ');
+        }
+        
         // Обновление интерфейса
         function updateUI() {
-            elements.money.textContent = gameState.money.toFixed(2);
-            elements.diamonds.textContent = gameState.diamonds;
-            elements.blockPrice.textContent = gameState.blockPrice;
-            elements.slotPrice.textContent = gameState.slotPrice;
-            elements.maxCards.textContent = gameState.maxCards;
-            elements.inventoryCount.textContent = gameState.cards.length;
-            elements.goldenCount.textContent = gameState.mutations.golden;
-            elements.diamondCount.textContent = gameState.mutations.diamond;
+            document.getElementById('money').textContent = gameState.money.toFixed(2);
+            document.getElementById('diamonds').textContent = gameState.diamonds;
+            document.getElementById('total-cards').textContent = gameState.cards.length;
+            document.getElementById('max-cards').textContent = gameState.maxCards;
+            document.getElementById('block-price').textContent = gameState.blockPrice;
+            document.getElementById('slot-price').textContent = gameState.slotPrice;
             
-            // Обновляем состояние кнопок
-            elements.smallPackBtn.disabled = gameState.money < 10 || gameState.cards.length >= gameState.maxCards;
-            elements.bigPackBtn.disabled = gameState.money < 25 || gameState.cards.length >= gameState.maxCards - 4;
-            elements.ultraPackBtn.disabled = gameState.money < 50 || gameState.cards.length >= gameState.maxCards - 7;
-            elements.buyBlockBtn.disabled = gameState.money < gameState.blockPrice;
-            elements.buySlotBtn.disabled = gameState.money < gameState.slotPrice;
+            document.getElementById('small-pack').disabled = gameState.money < packs.small.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('big-pack').disabled = gameState.money < packs.big.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('premium-pack').disabled = gameState.money < packs.premium.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('ultra-pack').disabled = gameState.money < packs.ultra.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('omega-pack').disabled = gameState.money < packs.omega.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('ruby-pack').disabled = gameState.money < packs.ruby.price || gameState.cards.length >= gameState.maxCards;
+            document.getElementById('ppp-pack').disabled = gameState.money < packs.ppp.price || gameState.cards.length >= gameState.maxCards;
             
-            // Обновляем мутации
-            elements.goldenMutation.classList.toggle('active', gameState.activeMutations.golden);
-            elements.diamondMutation.classList.toggle('active', gameState.activeMutations.diamond);
+            updateQuestUI();
         }
-
+        
+        // Переключение видимости магазина
+        function toggleShop() {
+            isShopOpen = !isShopOpen;
+            const shopContainer = document.getElementById('shop-container');
+            const shopToggle = document.getElementById('shop-toggle');
+            
+            if (isShopOpen) {
+                shopContainer.style.display = 'block';
+                shopToggle.textContent = 'Скрыть магазин пачек';
+            } else {
+                shopContainer.style.display = 'none';
+                shopToggle.textContent = 'Показать магазин пачек';
+            }
+        }
+        
+        // Переключение видимости магазина алмазов
+        function toggleDiamondShop() {
+            isDiamondShopOpen = !isDiamondShopOpen;
+            const diamondShopContainer = document.getElementById('diamond-shop-container');
+            const diamondShopToggle = document.getElementById('diamond-shop-toggle');
+            
+            if (isDiamondShopOpen) {
+                diamondShopContainer.style.display = 'block';
+                diamondShopToggle.textContent = 'Скрыть магазин алмазов';
+            } else {
+                diamondShopContainer.style.display = 'none';
+                diamondShopToggle.textContent = 'Показать магазин алмазов';
+            }
+        }
+        
         // Рендер блоков
         function renderBlocks() {
-            elements.blocksContainer.innerHTML = '';
+            const blocksContainer = document.getElementById('blocks');
+            blocksContainer.innerHTML = '';
+            
+            while (gameState.placedCards.length < gameState.blocks) {
+                gameState.placedCards.push(null);
+            }
             
             for (let i = 0; i < gameState.blocks; i++) {
                 const block = document.createElement('div');
                 block.className = 'block';
+                block.textContent = i + 1;
+                
+                if (mutationApplying) {
+                    block.onclick = () => applyMutation(i);
+                } else if (gameState.placedCards[i]) {
+                    block.onclick = (e) => {
+                        if (e.target.classList.contains('placed-card')) return;
+                        removeCard(i);
+                    };
+                } else {
+                    block.onclick = () => placeCard(i);
+                }
                 
                 if (gameState.placedCards[i]) {
                     const card = gameState.placedCards[i];
-                    const cardElement = createCardElement(card);
-                    block.appendChild(cardElement);
+                    const cardElement = document.createElement('div');
                     
-                    // Добавляем обработчик для снятия карты
-                    cardElement.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        removeCardFromBlock(i);
-                    });
+                    let cardClasses = `placed-card card ${card.rarity}`;
+                    if (card.mutation === 'golden') cardClasses += ' golden';
+                    else if (card.mutation === 'diamond') cardClasses += ' diamond';
+                    else if (card.mutation === 'wet') cardClasses += ' wet';
+                    else if (card.mutation === 'icy') cardClasses += ' icy';
+                    else if (card.mutation === 'electric') cardClasses += ' electric';
+                    
+                    cardElement.className = cardClasses;
+                    
+                    if (!mutationApplying) {
+                        cardElement.onclick = (e) => {
+                            e.stopPropagation();
+                            removeCard(i);
+                        };
+                    }
+                    
+                    const nameElement = document.createElement('div');
+                    nameElement.textContent = card.name;
+                    nameElement.style.fontWeight = 'bold';
+                    nameElement.style.fontSize = '12px';
+                    
+                    const incomeElement = document.createElement('div');
+                    incomeElement.textContent = `+${card.income.toFixed(2)}¢/сек`;
+                    incomeElement.style.fontSize = '10px';
+                    
+                    if (card.mutation) {
+                        const mutationIcon = document.createElement('div');
+                        mutationIcon.className = 'mutation-icon';
+                        
+                        switch(card.mutation) {
+                            case 'golden':
+                                mutationIcon.className += ' golden-mutation';
+                                mutationIcon.textContent = 'G';
+                                break;
+                            case 'diamond':
+                                mutationIcon.className += ' diamond-mutation';
+                                mutationIcon.textContent = 'D';
+                                break;
+                            case 'wet':
+                                mutationIcon.className += ' wet-mutation';
+                                mutationIcon.textContent = 'W';
+                                break;
+                            case 'icy':
+                                mutationIcon.className += ' icy-mutation';
+                                mutationIcon.textContent = 'I';
+                                break;
+                            case 'electric':
+                                mutationIcon.className += ' electric-mutation';
+                                mutationIcon.textContent = 'E';
+                                break;
+                        }
+                        
+                        cardElement.appendChild(mutationIcon);
+                    }
+                    
+                    cardElement.appendChild(nameElement);
+                    cardElement.appendChild(incomeElement);
+                    block.appendChild(cardElement);
                 }
                 
-                // Добавляем обработчик для размещения карты
-                block.addEventListener('click', () => {
-                    if (!gameState.placedCards[i]) {
-                        openCardSelection(i);
-                    }
-                });
-                
-                elements.blocksContainer.appendChild(block);
+                blocksContainer.appendChild(block);
             }
         }
-
+        
         // Рендер инвентаря
         function renderInventory() {
-            elements.inventory.innerHTML = '';
+            const inventory = document.getElementById('inventory');
+            inventory.innerHTML = '';
             
             gameState.cards.forEach((card, index) => {
-                const cardElement = createCardElement(card);
-                cardElement.classList.add('inventory-item');
-                cardElement.style.transform = 'scale(0.9)';
+                const cardElement = document.createElement('div');
+                cardElement.className = `inventory-card card ${card.rarity}`;
+                cardElement.textContent = card.name;
+                cardElement.dataset.index = index;
                 
-                // Добавляем tooltip
-                cardElement.addEventListener('mouseenter', (e) => {
-                    showTooltip(e, `Доход: ${card.income.toFixed(2)}¢/сек\nЗаработано: ${card.totalEarned.toFixed(2)}¢`);
-                });
-                
-                cardElement.addEventListener('mouseleave', hideTooltip);
-                
-                // Добавляем обработчик для размещения карты
-                cardElement.addEventListener('click', () => {
-                    const emptyBlockIndex = gameState.placedCards.indexOf(null);
-                    if (emptyBlockIndex !== -1) {
-                        placeCardFromInventory(index, emptyBlockIndex);
-                    } else {
-                        showNotification("Нет свободных блоков для размещения карты!");
-                    }
-                });
-                
-                elements.inventory.appendChild(cardElement);
-            });
-        }
-
-        // Создание элемента карты
-        function createCardElement(card) {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-            
-            if (card.type === 'golden') {
-                cardElement.classList.add('golden');
-            } else if (card.type === 'diamond') {
-                cardElement.classList.add('diamond');
-            }
-            
-            const cardHeader = document.createElement('div');
-            cardHeader.className = 'card-header';
-            cardHeader.textContent = card.name;
-            cardHeader.style.color = card.color;
-            
-            const cardBody = document.createElement('div');
-            cardBody.className = 'card-body';
-            
-            const cardValue = document.createElement('div');
-            cardValue.className = 'card-value';
-            cardValue.textContent = card.income.toFixed(2) + '¢';
-            
-            const cardFooter = document.createElement('div');
-            cardFooter.className = 'card-footer';
-            cardFooter.textContent = `Ур. ${card.level}`;
-            
-            cardBody.appendChild(cardValue);
-            cardElement.appendChild(cardHeader);
-            cardElement.appendChild(cardBody);
-            cardElement.appendChild(cardFooter);
-            
-            return cardElement;
-        }
-
-        // Покупка набора карт
-        function buyCardPack(count, price) {
-            if (gameState.money < price) {
-                showNotification("Недостаточно денег!");
-                return;
-            }
-            
-            if (gameState.cards.length + count > gameState.maxCards) {
-                showNotification("Недостаточно места в инвентаре!");
-                return;
-            }
-            
-            gameState.money -= price;
-            
-            // Обновляем статистику в зависимости от типа набора
-            if (count === 3) {
-                gameState.smallPacksOpened++;
-            } else if (count === 5) {
-                gameState.bigPacksOpened++;
-            } else if (count === 8) {
-                gameState.ultraPacksOpened++;
-            }
-            
-            // Создаем карты
-            for (let i = 0; i < count; i++) {
-                const card = generateRandomCard();
-                gameState.cards.push(card);
-                gameState.totalCardsCollected++;
-                
-                // Проверяем на редкую карту
-                if (card.rarity >= 4) {
-                    gameState.rareCardsFound++;
-                    showNotification(`Редкая карта получена: ${card.name}!`, 3000);
+                if (selectedCard === index) {
+                    cardElement.classList.add('selected');
                 }
-            }
-            
-            // Обновляем прогресс квеста
-            updateQuestProgress('collect', count);
-            
-            // Обновляем интерфейс
-            updateUI();
-            renderInventory();
-            saveGame();
-            
-            showNotification(`Вы купили набор из ${count} карт за ${price}¢!`);
-        }
-
-        // Генерация случайной карты
-        function generateRandomCard() {
-            // Учитываем бонус события
-            const luckBonus = gameState.eventLuck || 0;
-            
-            // Генерируем случайную редкость с учетом бонуса
-            let rarityRoll = Math.random() + luckBonus;
-            let rarity;
-            
-            if (rarityRoll < 0.6) rarity = 0; // 60% (с учетом бонуса может быть меньше)
-            else if (rarityRoll < 0.85) rarity = 1; // 25%
-            else if (rarityRoll < 0.95) rarity = 2; // 10%
-            else if (rarityRoll < 0.99) rarity = 3; // 4%
-            else if (rarityRoll < 0.998) rarity = 4; // 0.8%
-            else if (rarityRoll < 0.9998) rarity = 5; // 0.18%
-            else rarity = 6; // 0.02%
-            
-            // Получаем тип карты по редкости
-            const cardType = CARD_TYPES.find(type => type.rarity === rarity) || CARD_TYPES[0];
-            
-            // Создаем карту
-            const card = {
-                id: Date.now() + Math.random().toString(36).substr(2, 9),
-                name: cardType.name,
-                value: cardType.value,
-                income: cardType.value * 0.1, // Базовый доход
-                color: cardType.color,
-                rarity: cardType.rarity,
-                level: 1,
-                totalEarned: 0,
-                type: 'normal'
-            };
-            
-            // Применяем активные мутации
-            if (gameState.activeMutations.golden) {
-                MUTATIONS.golden.effect(card);
-            }
-            if (gameState.activeMutations.diamond) {
-                MUTATIONS.diamond.effect(card);
-            }
-            
-            return card;
-        }
-
-        // Открытие выбора карты для размещения
-        function openCardSelection(blockIndex) {
-            if (gameState.cards.length === 0) {
-                showNotification("В инвентаре нет карт!");
-                return;
-            }
-            
-            // Создаем модальное окно для выбора карты
-            const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
-            modal.style.display = 'flex';
-            modal.style.justifyContent = 'center';
-            modal.style.alignItems = 'center';
-            modal.style.zIndex = '1000';
-            
-            const modalContent = document.createElement('div');
-            modalContent.style.backgroundColor = 'white';
-            modalContent.style.padding = '20px';
-            modalContent.style.borderRadius = '10px';
-            modalContent.style.maxWidth = '80%';
-            modalContent.style.maxHeight = '80%';
-            modalContent.style.overflowY = 'auto';
-            
-            const title = document.createElement('h3');
-            title.textContent = 'Выберите карту для размещения';
-            modalContent.appendChild(title);
-            
-            const cardsContainer = document.createElement('div');
-            cardsContainer.style.display = 'grid';
-            cardsContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
-            cardsContainer.style.gap = '10px';
-            cardsContainer.style.marginTop = '15px';
-            
-            gameState.cards.forEach((card, index) => {
-                const cardElement = createCardElement(card);
-                cardElement.style.transform = 'scale(0.8)';
-                cardElement.style.cursor = 'pointer';
                 
-                cardElement.addEventListener('click', () => {
-                    placeCardFromInventory(index, blockIndex);
-                    document.body.removeChild(modal);
-                });
-                
-                cardsContainer.appendChild(cardElement);
-            });
-            
-            modalContent.appendChild(cardsContainer);
-            
-            const closeButton = document.createElement('button');
-            closeButton.textContent = 'Закрыть';
-            closeButton.className = 'btn';
-            closeButton.style.marginTop = '15px';
-            closeButton.addEventListener('click', () => {
-                document.body.removeChild(modal);
-            });
-            
-            modalContent.appendChild(closeButton);
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
-        }
-
-        // Размещение карты из инвентаря
-        function placeCardFromInventory(cardIndex, blockIndex) {
-            const card = gameState.cards[cardIndex];
-            
-            // Удаляем карту из инвентаря
-            gameState.cards.splice(cardIndex, 1);
-            
-            // Размещаем карту на блоке
-            gameState.placedCards[blockIndex] = card;
-            
-            // Обновляем интерфейс
-            updateUI();
-            renderBlocks();
-            renderInventory();
-            saveGame();
-        }
-
-        // Снятие карты с блока
-        function removeCardFromBlock(blockIndex) {
-            const card = gameState.placedCards[blockIndex];
-            
-            // Проверяем, есть ли место в инвентаре
-            if (gameState.cards.length >= gameState.maxCards) {
-                showNotification("Инвентарь полон! Увеличьте размер инвентаря или продайте карты.");
-                return;
-            }
-            
-            // Возвращаем карту в инвентарь
-            gameState.cards.push(card);
-            gameState.placedCards[blockIndex] = null;
-            
-            // Обновляем интерфейс
-            updateUI();
-            renderBlocks();
-            renderInventory();
-            saveGame();
-        }
-
-        // Пассивный доход
-        function passiveIncome() {
-            let totalIncome = 0;
-            
-            gameState.placedCards.forEach(card => {
-                if (card) {
-                    const income = card.income * (gameState.eventMultiplier || 1);
-                    gameState.money += income;
-                    card.totalEarned += income;
-                    gameState.totalEarned += income;
-                    totalIncome += income;
+                if (isSelling && index === sellingCardIndex) {
+                    cardElement.classList.add('selling');
                 }
+                
+                const timer = document.createElement('div');
+                timer.className = 'hold-timer';
+                cardElement.appendChild(timer);
+                
+                cardElement.addEventListener('mousedown', () => startHold(index));
+                cardElement.addEventListener('touchstart', () => startHold(index));
+                cardElement.addEventListener('mouseup', () => endHold(index));
+                cardElement.addEventListener('mouseleave', cancelHold);
+                cardElement.addEventListener('touchend', () => endHold(index));
+                
+                inventory.appendChild(cardElement);
             });
+        }
+        
+        // Начало удержания карты
+        function startHold(index) {
+            tapStartTime = Date.now();
+            sellingCardIndex = index;
             
-            if (totalIncome > 0) {
+            holdTimers[index] = setTimeout(() => {
+                prepareToSell(index);
+            }, 1000);
+            
+            const cardElement = document.querySelector(`.inventory-card[data-index="${index}"]`);
+            if (cardElement) {
+                const timer = cardElement.querySelector('.hold-timer');
+                timer.style.width = '100%';
+                timer.style.transition = 'width 1s linear';
+            }
+        }
+        
+        // Подготовка к продаже
+        function prepareToSell(index) {
+            isSelling = true;
+            sellingCardIndex = index;
+            renderInventory();
+            
+            setTimeout(() => {
+                if (isSelling && sellingCardIndex === index) {
+                    sellCard(index);
+                }
+            }, 300);
+        }
+        
+        // Завершение удержания
+        function endHold(index) {
+            const tapDuration = Date.now() - tapStartTime;
+            
+            if (holdTimers[index]) {
+                clearTimeout(holdTimers[index]);
+                delete holdTimers[index];
+            }
+            
+            const cardElement = document.querySelector(`.inventory-card[data-index="${index}"]`);
+            if (cardElement) {
+                const timer = cardElement.querySelector('.hold-timer');
+                timer.style.width = '0%';
+                timer.style.transition = 'none';
+            }
+            
+            if (tapDuration < 1000 && !isSelling) {
+                selectCard(index);
+            }
+            
+            isSelling = false;
+            sellingCardIndex = null;
+        }
+        
+        // Отмена удержания
+        function cancelHold() {
+            Object.values(holdTimers).forEach(timer => clearTimeout(timer));
+            holdTimers = {};
+            
+            isSelling = false;
+            sellingCardIndex = null;
+            renderInventory();
+        }
+        
+        // Выбор карты
+        function selectCard(index) {
+            selectedCard = index;
+            document.getElementById('selected-card-name').textContent = gameState.cards[index].name;
+            renderInventory();
+        }
+        
+        // Продажа карты
+        function sellCard(index) {
+            if (index >= 0 && index < gameState.cards.length) {
+                const card = gameState.cards[index];
+                const price = sellPrices[card.rarity] || 0;
+                
+                gameState.money += price;
+                gameState.cards.splice(index, 1);
+                
+                if (selectedCard === index) selectedCard = null;
+                else if (selectedCard > index) selectedCard--;
+                
                 updateUI();
-                
-                // Обновляем прогресс квеста
-                updateQuestProgress('earn', totalIncome);
+                renderInventory();
+                saveGame();
             }
         }
-
+        
+        // Размещение карты на блок
+        function placeCard(blockIndex) {
+            if (selectedCard === null) return;
+            
+            if (gameState.placedCards[blockIndex]) {
+                removeCard(blockIndex);
+            }
+            
+            gameState.placedCards[blockIndex] = gameState.cards[selectedCard];
+            gameState.cards.splice(selectedCard, 1);
+            selectedCard = null;
+            document.getElementById('selected-card-name').textContent = '';
+            
+            updateUI();
+            renderBlocks();
+            renderInventory();
+            saveGame();
+        }
+        
+        // Удаление карты из блока
+        function removeCard(blockIndex) {
+            if (gameState.placedCards[blockIndex] && gameState.cards.length < gameState.maxCards) {
+                gameState.cards.push(gameState.placedCards[blockIndex]);
+                gameState.placedCards[blockIndex] = null;
+                
+                updateUI();
+                renderBlocks();
+                renderInventory();
+                saveGame();
+            } else if (gameState.cards.length >= gameState.maxCards) {
+                alert('Инвентарь полон! Купите больше слотов.');
+            }
+        }
+        
+        // Покупка пачки
+        function buyPack(packType) {
+            const pack = packs[packType];
+            
+            if (gameState.money < pack.price) {
+                alert('Недостаточно денег!');
+                return;
+            }
+            
+            if (gameState.cards.length >= gameState.maxCards) {
+                alert('Инвентарь полон! Купите больше слотов.');
+                return;
+            }
+            
+            gameState.money -= pack.price;
+            
+            if (packType === 'small') gameState.smallPacksOpened++;
+            else if (packType === 'big') gameState.bigPacksOpened++;
+            else if (packType === 'ultra') gameState.ultraPacksOpened++;
+            
+            updateUI();
+            checkQuestCompletion();
+            
+            const packSize = Math.floor(Math.random() * (pack.size.max - pack.size.min + 1)) + pack.size.min;
+            
+            currentPack = pack;
+            cardsToOpen = packSize;
+            cardsOpened = 0;
+            
+            document.getElementById('pack-info').textContent = `Открываете ${getPackName(packType)} пачку (осталось: ${packSize} карт)`;
+            document.getElementById('pack-opening').style.display = 'flex';
+            
+            openNextCard();
+        }
+        
+        // Получение названия пачки
+        function getPackName(packType) {
+            switch(packType) {
+                case 'small': return 'маленькую';
+                case 'big': return 'большую';
+                case 'premium': return 'премиум';
+                case 'ultra': return 'ультра';
+                case 'omega': return 'ОМЕГА';
+                case 'ruby': return 'Рубин';
+                case 'ppp': return 'СЕКРЕТНУЮ';
+                default: return '';
+            }
+        }
+        
+        // Открытие следующей карты
+        function openNextCard() {
+            if (cardsOpened >= cardsToOpen) {
+                finishOpening();
+                return;
+            }
+            
+            const packCard = document.getElementById('pack-card');
+            packCard.innerHTML = '';
+            packCard.style.animation = 'none';
+            void packCard.offsetWidth;
+            packCard.style.animation = 'cardReveal 0.5s forwards';
+            
+            const card = getRandomCard(currentPack.cards);
+            
+            if (card.chance < 1) {
+                gameState.rareCardsFound++;
+                checkQuestCompletion();
+            }
+            
+            const nameElement = document.createElement('div');
+            nameElement.textContent = card.name;
+            nameElement.style.fontWeight = 'bold';
+            nameElement.style.fontSize = '18px';
+            nameElement.style.marginBottom = '10px';
+            
+            const rarityElement = document.createElement('div');
+            rarityElement.textContent = getRarityName(card.rarity);
+            rarityElement.style.fontSize = '14px';
+            rarityElement.style.marginBottom = '10px';
+            
+            const incomeElement = document.createElement('div');
+            incomeElement.textContent = `Доход: +${card.income}¢/сек`;
+            incomeElement.style.fontSize = '14px';
+            
+            packCard.className = `pack-card card ${card.rarity}`;
+            packCard.appendChild(nameElement);
+            packCard.appendChild(rarityElement);
+            packCard.appendChild(incomeElement);
+            
+            gameState.cards.push(card);
+            cardsOpened++;
+            
+            document.getElementById('pack-info').textContent = `Открываете ${getPackName(getPackType(currentPack))} пачку (осталось: ${cardsToOpen - cardsOpened} карт)`;
+            updateUI();
+            saveGame();
+        }
+        
+        // Получение типа пачки
+        function getPackType(pack) {
+            for (const type in packs) {
+                if (packs[type] === pack) return type;
+            }
+            return null;
+        }
+        
+        // Получение названия редкости
+        function getRarityName(rarity) {
+            switch(rarity) {
+                case 'common': return 'Обычная';
+                case 'rare': return 'Редкая';
+                case 'epic': return 'Эпическая';
+                case 'legendary': return 'Легендарная';
+                case 'mythic': return 'Мифическая';
+                case 'secret': return 'SECRET';
+                case 'divine': return 'БОЖЕСТВЕННАЯ';
+                default: return '';
+            }
+        }
+        
+        // Завершение открытия пачки
+        function finishOpening() {
+            document.getElementById('pack-opening').style.display = 'none';
+            renderInventory();
+        }
+        
+        // Продолжить открытие
+        function continueOpening() {
+            openNextCard();
+        }
+        
+        // Получение случайной карты
+        function getRandomCard(cardPool) {
+            const totalChance = cardPool.reduce((sum, card) => sum + card.chance, 0);
+            let random = Math.random() * totalChance;
+            
+            for (const card of cardPool) {
+                if (random < card.chance) {
+                    return {...card};
+                }
+                random -= card.chance;
+            }
+            
+            return {...cardPool[0]};
+        }
+        
         // Покупка блока
         function buyBlock() {
             if (gameState.money < gameState.blockPrice) {
-                showNotification("Недостаточно денег!");
+                alert('Недостаточно денег!');
                 return;
             }
             
@@ -1175,372 +1309,440 @@
             gameState.placedCards.push(null);
             gameState.blockPrice = Math.floor(gameState.blockPrice * 1.5);
             
+            checkQuestCompletion();
             updateUI();
             renderBlocks();
             saveGame();
-            
-            showNotification(`Вы купили новый блок! Теперь у вас ${gameState.blocks} блоков.`);
         }
-
-        // Покупка слота инвентаря
-        function buySlot() {
+        
+        // Покупка слота
+        function buyCardSlot() {
             if (gameState.money < gameState.slotPrice) {
-                showNotification("Недостаточно денег!");
+                alert('Недостаточно денег!');
                 return;
             }
             
             gameState.money -= gameState.slotPrice;
-            gameState.maxCards += 5;
+            gameState.maxCards++;
             gameState.slotsUpgraded++;
-            gameState.slotPrice = Math.floor(gameState.slotPrice * 1.3);
+            gameState.slotPrice = Math.floor(gameState.slotPrice * 1.05);
             
+            checkQuestCompletion();
             updateUI();
             saveGame();
-            
-            showNotification(`Вы увеличили инвентарь! Теперь вместимость: ${gameState.maxCards} карт.`);
         }
-
-        // Активация мутации
-        function activateMutation(type) {
-            if (gameState.mutations[type] <= 0) {
-                showNotification(`У вас нет ${MUTATIONS[type].name} мутаций!`);
+        
+        // Пассивный доход
+        function passiveIncome() {
+            let income = 0;
+            
+            gameState.placedCards.forEach(card => {
+                if (card) income += card.income;
+            });
+            
+            if (income > 0) {
+                gameState.money += income;
+                updateUI();
+                saveGame();
+            }
+        }
+        
+        // Обновление таймера квестов
+        function updateQuestTimer() {
+            const now = Date.now();
+            const delta = now - gameState.lastQuestUpdate;
+            gameState.lastQuestUpdate = now;
+            
+            // Если есть активный незавершенный квест - не обновляем таймер
+            if (gameState.currentQuest && !gameState.questCompleted) {
                 return;
             }
             
-            gameState.activeMutations[type] = !gameState.activeMutations[type];
-            
-            // Применяем мутацию ко всем картам
-            if (gameState.activeMutations[type]) {
-                // Для размещенных карт
-                gameState.placedCards.forEach(card => {
-                    if (card) {
-                        MUTATIONS[type].effect(card);
-                    }
-                });
+            // Уменьшаем таймер только если нет активного квеста
+            if (gameState.questTimer > 0) {
+                gameState.questTimer -= Math.floor(delta / 1000);
                 
-                // Для карт в инвентаре
-                gameState.cards.forEach(card => {
-                    MUTATIONS[type].effect(card);
-                });
-            } else {
-                // Сбрасываем мутацию для всех карт (сложная логика, упрощенно)
-                // В реальной игре нужно хранить исходные значения
-                gameState.placedCards.forEach(card => {
-                    if (card) {
-                        card.income = card.value * 0.1;
-                        card.type = 'normal';
-                    }
-                });
-                
-                gameState.cards.forEach(card => {
-                    card.income = card.value * 0.1;
-                    card.type = 'normal';
-                });
-                
-                // Применяем другие активные мутации
-                if (gameState.activeMutations.golden) {
-                    gameState.placedCards.forEach(card => {
-                        if (card) MUTATIONS.golden.effect(card);
-                    });
-                    gameState.cards.forEach(card => MUTATIONS.golden.effect(card));
+                if (gameState.questTimer < 0) {
+                    gameState.questTimer = 0;
                 }
                 
-                if (gameState.activeMutations.diamond) {
-                    gameState.placedCards.forEach(card => {
-                        if (card) MUTATIONS.diamond.effect(card);
-                    });
-                    gameState.cards.forEach(card => MUTATIONS.diamond.effect(card));
-                }
+                const minutes = Math.floor(gameState.questTimer / 60);
+                const seconds = gameState.questTimer % 60;
+                
+                document.getElementById('quest-timer').textContent = 
+                    `До нового квеста: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
             }
+            
+            // Если таймер истек - разрешаем взять новый квест
+            if (gameState.questTimer <= 0) {
+                document.getElementById('get-quest-btn').disabled = false;
+                document.getElementById('quest-timer').textContent = 'Можно взять новый квест';
+            }
+            
+            saveGame();
+        }
+        
+        // Обработчик кнопки квеста
+        function handleQuestButton() {
+            if (gameState.currentQuest && gameState.questCompleted) {
+                completeQuest();
+            } else {
+                getNewQuest();
+            }
+        }
+        
+        // Получение нового квеста
+        function getNewQuest() {
+            // Проверяем, можно ли взять новый квест
+            if (gameState.currentQuest && !gameState.questCompleted) {
+                alert('Сначала завершите текущий квест!');
+                return;
+            }
+            
+            if (gameState.questTimer > 0) {
+                alert('Подождите, пока таймер квеста истечет!');
+                return;
+            }
+            
+            // Выбираем случайный квест
+            const availableQuests = quests.filter(q => {
+                // Исключаем квест "Найти редкую карту", если уже найдена
+                if (q.id === 6 && gameState.rareCardsFound > 0) return false;
+                return true;
+            });
+            
+            const randomIndex = Math.floor(Math.random() * availableQuests.length);
+            const quest = availableQuests[randomIndex];
+            
+            gameState.currentQuest = {...quest};
+            gameState.questCompleted = false;
+            gameState.questTimer = 120; // Сбрасываем таймер
+            
+            document.getElementById('get-quest-btn').disabled = true;
+            updateQuestUI();
+            saveGame();
+        }
+        
+        // Обновление интерфейса квеста
+        function updateQuestUI() {
+            const questElement = document.getElementById('current-quest');
+            
+            if (gameState.currentQuest) {
+                const progress = gameState.currentQuest.progress(gameState);
+                questElement.innerHTML = `
+                    <strong>${gameState.currentQuest.name}</strong><br>
+                    ${gameState.currentQuest.description}<br>
+                    ${progress}
+                    ${gameState.questCompleted ? '<br><strong>Готово! Нажмите "Взять квест" для награды</strong>' : ''}
+                `;
+                
+                document.getElementById('get-quest-btn').textContent = 
+                    gameState.questCompleted ? 'Получить награду' : 'Взять квест у Джона';
+            } else {
+                questElement.textContent = 'Нет активного квеста';
+                document.getElementById('get-quest-btn').textContent = 'Взять квест у Джона';
+            }
+        }
+        
+        // Проверка выполнения квеста
+        function checkQuestCompletion() {
+            if (!gameState.currentQuest || gameState.questCompleted) return;
+            
+            if (gameState.currentQuest.condition(gameState)) {
+                gameState.questCompleted = true;
+                updateQuestUI();
+                saveGame();
+                
+                // Показываем уведомление о выполнении квеста
+                showNotification(`Квест "${gameState.currentQuest.name}" выполнен! Нажмите "Взять квест" для получения награды.`);
+            }
+        }
+        
+        // Завершение квеста и получение награды
+        function completeQuest() {
+            if (!gameState.currentQuest || !gameState.questCompleted) {
+                alert('Нет выполненного квеста!');
+                return;
+            }
+            
+            const reward = gameState.currentQuest.reward;
+            gameState.diamonds += reward.diamonds;
+            
+            showNotification(`Квест выполнен! Получено ${reward.diamonds} алмазов`);
+            
+            // Сбрасываем квест
+            gameState.currentQuest = null;
+            gameState.questCompleted = false;
+            gameState.questTimer = 120;
+            
+            updateUI();
+            saveGame();
+        }
+        
+        // Покупка мутации
+        function buyMutation(type) {
+            let cost, mutationName;
+            
+            switch(type) {
+                case 'golden':
+                    cost = 10;
+                    mutationName = 'Золотая мутация';
+                    break;
+                case 'diamond':
+                    cost = 35;
+                    mutationName = 'Алмазная мутация';
+                    break;
+                default:
+                    return;
+            }
+            
+            if (gameState.diamonds < cost) {
+                alert(`Недостаточно алмазов для ${mutationName}!`);
+                return;
+            }
+            
+            gameState.diamonds -= cost;
+            gameState.mutations[type]++;
+            
+            selectedMutation = type;
+            mutationApplying = true;
+            
+            showNotification(`Выберите карту для применения ${mutationName}`);
             
             updateUI();
             renderBlocks();
-            renderInventory();
-            saveGame();
-            
-            showNotification(`${MUTATIONS[type].name} ${gameState.activeMutations[type] ? 'активирована' : 'деактивирована'}!`);
-        }
-
-        // Генерация нового квеста
-        function generateNewQuest() {
-            // Выбираем случайный квест с учетом прогресса игрока
-            let availableQuests = QUEST_TYPES;
-            
-            // Если игрок еще не достиг определенного прогресса, не даем сложные квесты
-            if (gameState.totalEarned < 200) {
-                availableQuests = QUEST_TYPES.filter(q => q.rarity <= 2);
-            } else if (gameState.totalEarned < 500) {
-                availableQuests = QUEST_TYPES.filter(q => q.rarity <= 4);
-            }
-            
-            const randomIndex = Math.floor(Math.random() * availableQuests.length);
-            gameState.currentQuest = {...availableQuests[randomIndex]};
-            gameState.questProgress = 0;
-            gameState.questCompleted = false;
-            gameState.questTimer = 120; // 2 минуты на выполнение
-            gameState.lastQuestUpdate = Date.now();
-            
-            updateQuestUI();
             saveGame();
         }
-
-        // Обновление таймера квеста
-        function updateQuestTimer() {
-            if (!gameState.currentQuest || gameState.questCompleted) return;
+        
+        // Покупка улучшения за алмазы
+        function buyUpgrade(type) {
+            let cost, upgradeName, amount;
             
-            const now = Date.now();
-            const elapsed = Math.floor((now - gameState.lastQuestUpdate) / 1000);
-            
-            if (elapsed > 0) {
-                gameState.questTimer -= elapsed;
-                gameState.lastQuestUpdate = now;
-                
-                if (gameState.questTimer <= 0) {
-                    gameState.questTimer = 0;
-                    // Квест провален
-                    showNotification(`Квест "${gameState.currentQuest.name}" провален!`);
-                    generateNewQuest();
-                }
-                
-                updateQuestUI();
-                saveGame();
-            }
-        }
-
-        // Обновление прогресса квеста
-        function updateQuestProgress(type, amount) {
-            if (!gameState.currentQuest || gameState.questCompleted) return;
-            
-            let progressNeeded = false;
-            
-            // Проверяем тип квеста и обновляем прогресс
-            if (type === 'earn' && gameState.currentQuest.description.includes("Получите") || 
-                gameState.currentQuest.description.includes("Заработайте")) {
-                gameState.questProgress += amount;
-                progressNeeded = true;
-            } else if (type === 'collect' && gameState.currentQuest.description.includes("Соберите")) {
-                gameState.questProgress += amount;
-                progressNeeded = true;
+            switch(type) {
+                case 'slots':
+                    cost = 5;
+                    upgradeName = '+2 слота';
+                    amount = 2;
+                    break;
+                case 'blocks':
+                    cost = 10;
+                    upgradeName = '+2 блока';
+                    amount = 2;
+                    break;
+                default:
+                    return;
             }
             
-            // Проверяем выполнение квеста
-            if (progressNeeded && gameState.questProgress >= gameState.currentQuest.target) {
-                completeQuest();
-            } else if (progressNeeded) {
-                updateQuestUI();
-                saveGame();
-            }
-        }
-
-        // Завершение квеста
-        function completeQuest() {
-            gameState.questCompleted = true;
-            
-            // Награда с учетом бонуса события
-            const rewardMultiplier = gameState.questBonus || 1;
-            const moneyReward = Math.floor(gameState.currentQuest.reward.money * rewardMultiplier);
-            const diamondsReward = Math.floor(gameState.currentQuest.reward.diamonds * rewardMultiplier);
-            
-            gameState.money += moneyReward;
-            gameState.diamonds += diamondsReward;
-            
-            // Добавляем мутации за алмазы
-            if (diamondsReward > 0) {
-                gameState.mutations.golden += Math.floor(diamondsReward / 2);
-                gameState.mutations.diamond += Math.floor(diamondsReward / 5);
-            }
-            
-            showNotification(
-                `Квест "${gameState.currentQuest.name}" выполнен! ` +
-                `Награда: ${moneyReward}¢ и ${diamondsReward}💎`
-            );
-            
-            updateUI();
-            updateQuestUI();
-            saveGame();
-            
-            // Генерируем новый квест через 5 секунд
-            setTimeout(generateNewQuest, 5000);
-        }
-
-        // Обновление интерфейса квеста
-        function updateQuestUI() {
-            elements.questContainer.innerHTML = '';
-            
-            if (!gameState.currentQuest) {
-                generateNewQuest();
+            if (gameState.diamonds < cost) {
+                alert(`Недостаточно алмазов для ${upgradeName}!`);
                 return;
             }
             
-            const questElement = document.createElement('div');
-            questElement.className = 'quest';
+            gameState.diamonds -= cost;
             
-            const title = document.createElement('div');
-            title.className = 'quest-title';
-            title.textContent = gameState.currentQuest.name;
-            
-            const desc = document.createElement('div');
-            desc.className = 'quest-desc';
-            desc.textContent = gameState.currentQuest.description;
-            
-            const progressContainer = document.createElement('div');
-            progressContainer.className = 'quest-progress';
-            
-            const progressBar = document.createElement('div');
-            progressBar.className = 'quest-progress-bar';
-            
-            const progressText = document.createElement('div');
-            progressText.style.fontSize = '12px';
-            progressText.style.marginTop = '5px';
-            
-            const reward = document.createElement('div');
-            reward.className = 'quest-reward';
-            
-            const timer = document.createElement('div');
-            timer.className = 'quest-timer';
-            
-            // Устанавливаем прогресс
-            const progressPercent = Math.min((gameState.questProgress / gameState.currentQuest.target) * 100, 100);
-            progressBar.style.width = `${progressPercent}%`;
-            
-            progressText.textContent = `${Math.min(gameState.questProgress, gameState.currentQuest.target)}/${gameState.currentQuest.target}`;
-            
-            // Устанавливаем награду
-            const rewardMultiplier = gameState.questBonus || 1;
-            const moneyReward = Math.floor(gameState.currentQuest.reward.money * rewardMultiplier);
-            const diamondsReward = Math.floor(gameState.currentQuest.reward.diamonds * rewardMultiplier);
-            
-            reward.textContent = `Награда: ${moneyReward}¢ + ${diamondsReward}💎`;
-            
-            // Устанавливаем таймер
-            const minutes = Math.floor(gameState.questTimer / 60);
-            const seconds = gameState.questTimer % 60;
-            timer.textContent = `Осталось: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            
-            // Если квест выполнен, показываем сообщение
-            if (gameState.questCompleted) {
-                const completed = document.createElement('div');
-                completed.style.color = '#2ecc71';
-                completed.style.fontWeight = 'bold';
-                completed.textContent = 'Квест выполнен! Ожидайте новый квест...';
-                questElement.appendChild(completed);
-            }
-            
-            progressContainer.appendChild(progressBar);
-            questElement.appendChild(title);
-            questElement.appendChild(desc);
-            questElement.appendChild(progressContainer);
-            questElement.appendChild(progressText);
-            questElement.appendChild(reward);
-            questElement.appendChild(timer);
-            
-            elements.questContainer.appendChild(questElement);
-        }
-
-        // Случайные события
-        function checkForRandomEvent() {
-            if (gameState.eventActive) return;
-            
-            // 10% шанс на событие
-            if (Math.random() < 0.1) {
-                const randomEvent = EVENTS[Math.floor(Math.random() * EVENTS.length)];
-                startEvent(randomEvent);
-            }
-        }
-
-        // Начало события
-        function startEvent(event) {
-            gameState.eventActive = event;
-            gameState.eventTimer = event.duration;
-            
-            // Применяем эффект события
-            event.effect();
-            
-            // Создаем баннер события
-            const eventBanner = document.createElement('div');
-            eventBanner.className = 'event-banner';
-            eventBanner.textContent = `${event.name}: ${event.description}`;
-            eventBanner.id = 'event-banner';
-            
-            // Вставляем баннер перед игровой областью
-            const gameArea = document.querySelector('.game-area');
-            gameArea.insertBefore(eventBanner, gameArea.firstChild);
-            
-            // Запускаем таймер события
-            gameState.eventIntervalId = setInterval(() => {
-                gameState.eventTimer--;
-                
-                if (gameState.eventTimer <= 0) {
-                    endCurrentEvent();
+            if (type === 'slots') {
+                gameState.maxCards += amount;
+                gameState.slotsUpgraded += amount;
+            } else {
+                gameState.blocks += amount;
+                gameState.blocksUpgraded += amount;
+                for (let i = 0; i < amount; i++) {
+                    gameState.placedCards.push(null);
                 }
-            }, 1000);
+            }
             
-            showNotification(`Началось событие: ${event.name}!`);
+            showNotification(`Улучшение "${upgradeName}" приобретено!`);
+            
+            checkQuestCompletion();
+            updateUI();
+            renderBlocks();
+            saveGame();
+        }
+        
+        // Применение мутации к карте
+        function applyMutation(blockIndex) {
+            if (!selectedMutation || !gameState.placedCards[blockIndex]) return;
+
+            const card = gameState.placedCards[blockIndex];
+            
+            // Если уже есть такая же мутация - удаляем
+            if (card.mutation === selectedMutation) {
+                if (card.originalIncome !== undefined) {
+                    card.income = card.originalIncome;
+                    delete card.originalIncome;
+                }
+                delete card.mutation;
+                showNotification(`Мутация "${getMutationName(selectedMutation)}" удалена с карты "${card.name}"!`);
+            } 
+            // Если другая мутация - заменяем
+            else {
+                // Удаляем предыдущую мутацию если есть
+                if (card.mutation) {
+                    if (card.originalIncome !== undefined) {
+                        card.income = card.originalIncome;
+                        delete card.originalIncome;
+                    }
+                    delete card.mutation;
+                }
+                
+                // Удаляем временные эффекты
+                if (card.tempMutation) {
+                    const event = events.find(e => e.id === card.tempMutation);
+                    if (event) event.endEffect(card);
+                    delete card.tempMutation;
+                }
+
+                // Применяем новую мутацию
+                card.originalIncome = card.income;
+                switch(selectedMutation) {
+                    case 'golden':
+                        card.income *= 5;
+                        card.mutation = 'golden';
+                        break;
+                    case 'diamond':
+                        card.income *= 15;
+                        card.mutation = 'diamond';
+                        break;
+                }
+                showNotification(`Мутация "${getMutationName(selectedMutation)}" применена к карте "${card.name}"!`);
+            }
+
+            selectedMutation = null;
+            mutationApplying = false;
+            updateUI();
+            renderBlocks();
             saveGame();
         }
 
-        // Завершение текущего события
+        // Получение названия мутации
+        function getMutationName(mutationType) {
+            switch(mutationType) {
+                case 'golden': return 'Золотая';
+                case 'diamond': return 'Алмазная';
+                default: return '';
+            }
+        }
+        
+        // Проверка на случайное событие
+        function checkForRandomEvent() {
+            if (gameState.placedCards.length === 0) return;
+            if (gameState.eventActive) return;
+
+            const totalChance = events.reduce((sum, e) => sum + e.chance, 0);
+            let random = Math.random() * totalChance;
+            let selectedEvent = null;
+
+            for (const event of events) {
+                if (random < event.chance) {
+                    selectedEvent = event;
+                    break;
+                }
+                random -= event.chance;
+            }
+
+            if (!selectedEvent || selectedEvent.id === 'nothing') return;
+
+            gameState.eventActive = selectedEvent.id;
+            showNotification(`Начинается ${selectedEvent.name}!`, selectedEvent.color);
+
+            const weatherEffect = document.getElementById('weather-effect');
+            weatherEffect.className = `weather-effect ${selectedEvent.effectClass}`;
+            weatherEffect.style.display = 'block';
+
+            // Применяем эффект сразу ко всем подходящим картам
+            gameState.placedCards.forEach(card => {
+                if (card && !card.mutation) { // Не применяем к картам с постоянными мутациями
+                    selectedEvent.effect(card);
+                }
+            });
+
+            // Устанавливаем интервал для новых эффектов
+            gameState.eventIntervalId = setInterval(() => {
+                applyEventEffect(selectedEvent);
+            }, selectedEvent.interval * 1000);
+            
+            gameState.eventTimer = setTimeout(() => {
+                endCurrentEvent();
+                showNotification(`${selectedEvent.name} закончился.`, selectedEvent.color);
+            }, selectedEvent.duration * 1000);
+            
+            renderBlocks();
+            saveGame();
+        }
+
+        // Применение эффекта к случайной карте
+        function applyEventEffect(event) {
+            const activeCards = gameState.placedCards.filter(card => 
+                card !== null && !card.mutation // Только карты без постоянных мутаций
+            );
+            
+            if (activeCards.length === 0) return;
+            
+            const randomIndex = Math.floor(Math.random() * activeCards.length);
+            const card = activeCards[randomIndex];
+            
+            // Удаляем предыдущий временный эффект если есть
+            if (card.tempMutation) {
+                const prevEvent = events.find(e => e.id === card.tempMutation);
+                if (prevEvent) prevEvent.endEffect(card);
+            }
+            
+            // Применяем новый эффект
+            event.effect(card);
+            
+            showNotification(`${event.name} усиливает карту "${card.name}"!`, event.color);
+            
+            renderBlocks();
+            saveGame();
+        }
+
+        // Завершение события
         function endCurrentEvent() {
             if (!gameState.eventActive) return;
             
-            // Удаляем баннер события
-            const banner = document.getElementById('event-banner');
-            if (banner) banner.remove();
+            const event = events.find(e => e.id === gameState.eventActive);
+            if (!event) return;
             
-            // Применяем завершающий эффект
-            gameState.eventActive.endEffect();
+            // Удаляем все эффекты этого события
+            gameState.placedCards.forEach(card => {
+                if (card && card.tempMutation === event.id) {
+                    event.endEffect(card);
+                }
+            });
             
-            // Очищаем интервал
+            // Очищаем таймеры
             if (gameState.eventIntervalId) {
                 clearInterval(gameState.eventIntervalId);
+                gameState.eventIntervalId = null;
             }
             
-            showNotification(`Событие "${gameState.eventActive.name}" завершено!`);
+            if (gameState.eventTimer) {
+                clearTimeout(gameState.eventTimer);
+                gameState.eventTimer = null;
+            }
             
-            // Сбрасываем состояние события
+            // Скрываем эффект погоды
+            document.getElementById('weather-effect').style.display = 'none';
             gameState.eventActive = null;
-            gameState.eventTimer = null;
-            gameState.eventIntervalId = null;
             
+            renderBlocks();
             saveGame();
         }
 
-        // Показ уведомления
-        function showNotification(message, duration = 2000) {
-            const notification = elements.notification;
+        // Показать уведомление
+        function showNotification(message, color = '#333') {
+            const notification = document.createElement('div');
+            notification.className = 'event-notification';
             notification.textContent = message;
-            notification.classList.add('show');
+            notification.style.backgroundColor = color;
+            
+            document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.classList.remove('show');
-            }, duration);
+                notification.remove();
+            }, 3000);
         }
-
-        // Показ подсказки
-        function showTooltip(event, text) {
-            elements.tooltip.textContent = text;
-            elements.tooltip.style.opacity = '1';
-        }
-
-        // Скрытие подсказки
-        function hideTooltip() {
-            elements.tooltip.style.opacity = '0';
-        }
-
-        // Форматирование времени
-        function formatTime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-            
-            let result = '';
-            if (hours > 0) result += `${hours}ч `;
-            if (minutes > 0) result += `${minutes}м `;
-            result += `${secs}с`;
-            
-            return result.trim();
-        }
-
+        
         // Запуск игры при загрузке
         window.onload = initGame;
     </script>
