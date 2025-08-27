@@ -64,6 +64,7 @@
             padding: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             font-size: 14px;
+            position: relative;
         }
         
         .card.common {
@@ -137,6 +138,30 @@
             animation: electric 0.5s infinite alternate;
         }
         
+        .card.diamond {
+            background: linear-gradient(45deg, #b9f2ff, #e0f7ff, #b9f2ff);
+            background-size: 200% 200%;
+            animation: diamondShine 3s ease infinite;
+            border: 2px solid #00bfff;
+            color: #003366;
+        }
+        
+        .card.fire {
+            background: linear-gradient(45deg, #ff4500, #ff8c00, #ff4500);
+            background-size: 200% 200%;
+            animation: fire 2s ease infinite;
+            border: 2px solid #ff4500;
+            color: #8B0000;
+        }
+        
+        .card.void {
+            background: linear-gradient(45deg, #4B0082, #483D8B, #4B0082);
+            background-size: 200% 200%;
+            animation: void 4s ease infinite;
+            border: 2px solid #000;
+            color: #E6E6FA;
+        }
+        
         @keyframes rainbow {
             0% {background-position: 0% 50%}
             50% {background-position: 100% 50%}
@@ -151,6 +176,24 @@
         @keyframes electric {
             from {box-shadow: 0 0 5px #ffd700;}
             to {box-shadow: 0 0 20px #ffd700, 0 0 30px #ff4500;}
+        }
+        
+        @keyframes diamondShine {
+            0% {background-position: 0% 50%; box-shadow: 0 0 5px #00bfff;}
+            50% {background-position: 100% 50%; box-shadow: 0 0 20px #00bfff;}
+            100% {background-position: 0% 50%; box-shadow: 0 0 5px #00bfff;}
+        }
+        
+        @keyframes fire {
+            0% {background-position: 0% 50%; box-shadow: 0 0 5px #ff4500;}
+            50% {background-position: 100% 50%; box-shadow: 0 0 15px #ff8c00;}
+            100% {background-position: 0% 50%; box-shadow: 0 0 5px #ff4500;}
+        }
+        
+        @keyframes void {
+            0% {background-position: 0% 50%; box-shadow: 0 0 5px #4B0082;}
+            50% {background-position: 100% 50%; box-shadow: 0 0 10px #483D8B, 0 0 15px #6A5ACD;}
+            100% {background-position: 0% 50%; box-shadow: 0 0 5px #4B0082;}
         }
         
         .pack-buttons {
@@ -381,6 +424,26 @@
             color: #ff4500;
         }
         
+        .fire-mutation {
+            background-color: #ff4500;
+            color: white;
+        }
+        
+        .void-mutation {
+            background-color: #4B0082;
+            color: white;
+        }
+        
+        .mutation-container {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            max-width: 80%;
+        }
+        
         footer {
             margin-top: 20px;
             padding: 10px;
@@ -433,6 +496,26 @@
             3% { background-color: rgba(255, 255, 255, 0.5); }
             4% { background-color: transparent; }
         }
+        
+        .mutation-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
+            display: none;
+            font-size: 12px;
+            text-align: center;
+            max-width: 90%;
+        }
+        
+        .card:hover .mutation-info {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -467,6 +550,8 @@
             <div class="pack-buttons">
                 <button onclick="buyMutation('golden')">Золотая мутация (10♦)</button>
                 <button onclick="buyMutation('diamond')">Алмазная мутация (35♦)</button>
+                <button onclick="buyMutation('fire')">Огненная мутация (25♦)</button>
+                <button onclick="buyMutation('void')">Безднная мутация (50♦)</button>
                 <button onclick="buyUpgrade('slots')">+2 слота (5♦)</button>
                 <button onclick="buyUpgrade('blocks')">+2 блока (10♦)</button>
             </div>
@@ -500,6 +585,7 @@
     
     <footer>
         <p>Новая система алмазов: получайте алмазы случайным образом при открытии пачек!</p>
+        <p>Мутации сохраняются навсегда и могут комбинироваться на одной карте!</p>
     </footer>
     
     <script>
@@ -522,7 +608,9 @@
             rareCardsFound: 0,
             mutations: {
                 golden: 0,
-                diamond: 0
+                diamond: 0,
+                fire: 0,
+                void: 0
             },
             activeMutations: {},
             eventActive: null,
@@ -552,6 +640,14 @@
             mythic: 200,
             divine: 40000,
             secret: 100000
+        };
+        
+        // Множители дохода для мутаций
+        const mutationMultipliers = {
+            golden: 2,
+            diamond: 3,
+            fire: 2.5,
+            void: 4
         };
         
         // Карточные пачки
@@ -786,7 +882,7 @@
                         if (offlineSeconds > 0 && gameState.placedCards.length > 0) {
                             let offlineIncome = 0;
                             gameState.placedCards.forEach(card => {
-                                if (card) offlineIncome += card.income * offlineSeconds;
+                                if (card) offlineIncome += calculateCardIncome(card) * offlineSeconds;
                             });
                             
                             if (offlineIncome > 0) {
@@ -892,12 +988,13 @@
                     const card = gameState.placedCards[i];
                     const cardElement = document.createElement('div');
                     
+                    // Определяем классы карты
                     let cardClasses = `placed-card card ${card.rarity}`;
-                    if (card.mutation === 'golden') cardClasses += ' golden';
-                    else if (card.mutation === 'diamond') cardClasses += ' diamond';
-                    else if (card.mutation === 'wet') cardClasses += ' wet';
-                    else if (card.mutation === 'icy') cardClasses += ' icy';
-                    else if (card.mutation === 'electric') cardClasses += ' electric';
+                    if (card.mutations && card.mutations.length > 0) {
+                        // Применяем стиль последней мутации
+                        const lastMutation = card.mutations[card.mutations.length - 1];
+                        cardClasses += ` ${lastMutation}`;
+                    }
                     
                     cardElement.className = cardClasses;
                     
@@ -914,37 +1011,61 @@
                     nameElement.style.fontSize = '12px';
                     
                     const incomeElement = document.createElement('div');
-                    incomeElement.textContent = `+${card.income.toFixed(2)}¢/сек`;
+                    incomeElement.textContent = `+${calculateCardIncome(card).toFixed(2)}¢/сек`;
                     incomeElement.style.fontSize = '10px';
                     
-                    if (card.mutation) {
-                        const mutationIcon = document.createElement('div');
-                        mutationIcon.className = 'mutation-icon';
+                    // Добавляем иконки мутаций
+                    if (card.mutations && card.mutations.length > 0) {
+                        const mutationContainer = document.createElement('div');
+                        mutationContainer.className = 'mutation-container';
                         
-                        switch(card.mutation) {
-                            case 'golden':
-                                mutationIcon.className += ' golden-mutation';
-                                mutationIcon.textContent = 'G';
-                                break;
-                            case 'diamond':
-                                mutationIcon.className += ' diamond-mutation';
-                                mutationIcon.textContent = 'D';
-                                break;
-                            case 'wet':
-                                mutationIcon.className += ' wet-mutation';
-                                mutationIcon.textContent = 'W';
-                                break;
-                            case 'icy':
-                                mutationIcon.className += ' icy-mutation';
-                                mutationIcon.textContent = 'I';
-                                break;
-                            case 'electric':
-                                mutationIcon.className += ' electric-mutation';
-                                mutationIcon.textContent = 'E';
-                                break;
-                        }
+                        card.mutations.forEach(mutation => {
+                            const mutationIcon = document.createElement('div');
+                            mutationIcon.className = 'mutation-icon';
+                            
+                            switch(mutation) {
+                                case 'golden':
+                                    mutationIcon.className += ' golden-mutation';
+                                    mutationIcon.textContent = 'G';
+                                    break;
+                                case 'diamond':
+                                    mutationIcon.className += ' diamond-mutation';
+                                    mutationIcon.textContent = 'D';
+                                    break;
+                                case 'wet':
+                                    mutationIcon.className += ' wet-mutation';
+                                    mutationIcon.textContent = 'W';
+                                    break;
+                                case 'icy':
+                                    mutationIcon.className += ' icy-mutation';
+                                    mutationIcon.textContent = 'I';
+                                    break;
+                                case 'electric':
+                                    mutationIcon.className += ' electric-mutation';
+                                    mutationIcon.textContent = 'E';
+                                    break;
+                                case 'fire':
+                                    mutationIcon.className += ' fire-mutation';
+                                    mutationIcon.textContent = 'F';
+                                    break;
+                                case 'void':
+                                    mutationIcon.className += ' void-mutation';
+                                    mutationIcon.textContent = 'V';
+                                    break;
+                            }
+                            
+                            mutationContainer.appendChild(mutationIcon);
+                        });
                         
-                        cardElement.appendChild(mutationIcon);
+                        cardElement.appendChild(mutationContainer);
+                    }
+                    
+                    // Добавляем информацию о мутациях при наведении
+                    if (card.mutations && card.mutations.length > 0) {
+                        const mutationInfo = document.createElement('div');
+                        mutationInfo.className = 'mutation-info';
+                        mutationInfo.textContent = `Мутации: ${card.mutations.join(', ')}`;
+                        cardElement.appendChild(mutationInfo);
                     }
                     
                     cardElement.appendChild(nameElement);
@@ -956,6 +1077,22 @@
             }
         }
         
+        // Расчет дохода карты с учетом всех мутаций
+        function calculateCardIncome(card) {
+            if (!card.mutations || card.mutations.length === 0) {
+                return card.income;
+            }
+            
+            let totalMultiplier = 1;
+            card.mutations.forEach(mutation => {
+                if (mutationMultipliers[mutation]) {
+                    totalMultiplier *= mutationMultipliers[mutation];
+                }
+            });
+            
+            return card.income * totalMultiplier;
+        }
+        
         // Рендер инвентаря
         function renderInventory() {
             const inventory = document.getElementById('inventory');
@@ -964,6 +1101,13 @@
             gameState.cards.forEach((card, index) => {
                 const cardElement = document.createElement('div');
                 cardElement.className = `inventory-card card ${card.rarity}`;
+                
+                // Применяем стиль последней мутации, если есть
+                if (card.mutations && card.mutations.length > 0) {
+                    const lastMutation = card.mutations[card.mutations.length - 1];
+                    cardElement.classList.add(lastMutation);
+                }
+                
                 cardElement.textContent = card.name;
                 cardElement.dataset.index = index;
                 
@@ -973,6 +1117,40 @@
                 
                 if (isSelling && index === sellingCardIndex) {
                     cardElement.classList.add('selling');
+                }
+                
+                // Добавляем иконки мутаций
+                if (card.mutations && card.mutations.length > 0) {
+                    const mutationContainer = document.createElement('div');
+                    mutationContainer.className = 'mutation-container';
+                    
+                    card.mutations.forEach(mutation => {
+                        const mutationIcon = document.createElement('div');
+                        mutationIcon.className = 'mutation-icon';
+                        
+                        switch(mutation) {
+                            case 'golden':
+                                mutationIcon.className += ' golden-mutation';
+                                mutationIcon.textContent = 'G';
+                                break;
+                            case 'diamond':
+                                mutationIcon.className += ' diamond-mutation';
+                                mutationIcon.textContent = 'D';
+                                break;
+                            case 'fire':
+                                mutationIcon.className += ' fire-mutation';
+                                mutationIcon.textContent = 'F';
+                                break;
+                            case 'void':
+                                mutationIcon.className += ' void-mutation';
+                                mutationIcon.textContent = 'V';
+                                break;
+                        }
+                        
+                        mutationContainer.appendChild(mutationIcon);
+                    });
+                    
+                    cardElement.appendChild(mutationContainer);
                 }
                 
                 const timer = document.createElement('div');
@@ -1066,7 +1244,13 @@
                 const card = gameState.cards[index];
                 const price = sellPrices[card.rarity] || 0;
                 
-                gameState.money += price;
+                // Добавляем бонус к цене за мутации
+                let bonus = 0;
+                if (card.mutations && card.mutations.length > 0) {
+                    bonus = card.mutations.length * price * 0.5; // +50% за каждую мутацию
+                }
+                
+                gameState.money += price + bonus;
                 gameState.cards.splice(index, 1);
                 
                 if (selectedCard === index) selectedCard = null;
@@ -1317,7 +1501,7 @@
             let income = 0;
             
             gameState.placedCards.forEach(card => {
-                if (card) income += card.income;
+                if (card) income += calculateCardIncome(card);
             });
             
             if (income > 0) {
@@ -1339,6 +1523,14 @@
                 case 'diamond':
                     cost = 35;
                     mutationName = 'Алмазная мутация';
+                    break;
+                case 'fire':
+                    cost = 25;
+                    mutationName = 'Огненная мутация';
+                    break;
+                case 'void':
+                    cost = 50;
+                    mutationName = 'Безднная мутация';
                     break;
                 default:
                     return;
@@ -1412,45 +1604,22 @@
 
             const card = gameState.placedCards[blockIndex];
             
-            // Если уже есть такая же мутация - удаляем
-            if (card.mutation === selectedMutation) {
-                if (card.originalIncome !== undefined) {
-                    card.income = card.originalIncome;
-                    delete card.originalIncome;
-                }
-                delete card.mutation;
+            // Инициализируем массив мутаций, если его нет
+            if (!card.mutations) {
+                card.mutations = [];
+            }
+            
+            // Проверяем, есть ли уже такая мутация
+            const mutationIndex = card.mutations.indexOf(selectedMutation);
+            
+            // Если мутация уже есть - удаляем ее
+            if (mutationIndex !== -1) {
+                card.mutations.splice(mutationIndex, 1);
                 showNotification(`Мутация "${getMutationName(selectedMutation)}" удалена с карты "${card.name}"!`);
             } 
-            // Если другая мутация - заменяем
+            // Если мутации нет - добавляем
             else {
-                // Удаляем предыдущую мутацию если есть
-                if (card.mutation) {
-                    if (card.originalIncome !== undefined) {
-                        card.income = card.originalIncome;
-                        delete card.originalIncome;
-                    }
-                    delete card.mutation;
-                }
-                
-                // Удаляем временные эффекты
-                if (card.tempMutation) {
-                    const event = events.find(e => e.id === card.tempMutation);
-                    if (event) event.endEffect(card);
-                    delete card.tempMutation;
-                }
-
-                // Применяем новую мутацию
-                card.originalIncome = card.income;
-                switch(selectedMutation) {
-                    case 'golden':
-                        card.income *= 5;
-                        card.mutation = 'golden';
-                        break;
-                    case 'diamond':
-                        card.income *= 15;
-                        card.mutation = 'diamond';
-                        break;
-                }
+                card.mutations.push(selectedMutation);
                 showNotification(`Мутация "${getMutationName(selectedMutation)}" применена к карте "${card.name}"!`);
             }
 
@@ -1466,6 +1635,8 @@
             switch(mutationType) {
                 case 'golden': return 'Золотая';
                 case 'diamond': return 'Алмазная';
+                case 'fire': return 'Огненная';
+                case 'void': return 'Безднная';
                 default: return '';
             }
         }
@@ -1498,7 +1669,7 @@
 
             // Применяем эффект сразу ко всем подходящим картам
             gameState.placedCards.forEach(card => {
-                if (card && !card.mutation) { // Не применяем к картам с постоянными мутациями
+                if (card && (!card.mutations || card.mutations.length === 0)) { // Не применяем к картам с постоянными мутациями
                     selectedEvent.effect(card);
                 }
             });
@@ -1520,7 +1691,7 @@
         // Применение эффекта к случайной карте
         function applyEventEffect(event) {
             const activeCards = gameState.placedCards.filter(card => 
-                card !== null && !card.mutation // Только карты без постоянных мутаций
+                card !== null && (!card.mutations || card.mutations.length === 0) // Только карты без постоянных мутаций
             );
             
             if (activeCards.length === 0) return;
