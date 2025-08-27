@@ -499,17 +499,7 @@
     <div id="weather-effect" class="weather-effect" style="display: none;"></div>
     
     <footer>
-        <div class="quest-container">
-            <div class="inventory-title">
-                <span>Квесты</span>
-                <span id="quest-timer">До нового квеста: 2:00</span>
-            </div>
-            <div id="current-quest">Нет активного квеста</div>
-            <button class="quest-button" id="get-quest-btn" onclick="handleQuestButton()">Взять квест у Джона</button>
-        </div>
-        <p>ОБНОВЛЕНИЕ КАЖДАЯ ПЯТНИЦА:</p>
-        <p>18:00, новая версия: 1.1</p>
-        <p>ОБНОВЛЕНИЕ ИНФО: хэй!хочешь награды? тебе нужно сделать...</p>
+        <p>Новая система алмазов: получайте алмазы случайным образом при открытии пачек!</p>
     </footer>
     
     <script>
@@ -535,13 +525,9 @@
                 diamond: 0
             },
             activeMutations: {},
-            currentQuest: null,
-            questCompleted: false,
-            questTimer: 120,
             eventActive: null,
             eventTimer: null,
-            eventIntervalId: null,
-            lastQuestUpdate: Date.now()
+            eventIntervalId: null
         };
         
         let selectedCard = null;
@@ -573,6 +559,7 @@
             small: {
                 price: 5,
                 size: { min: 4, max: 6 },
+                diamondChance: 1, // 1% шанс получить алмаз
                 cards: [
                     { name: "Blockman Go!", chance: 50, rarity: "common", income: 0.01 },
                     { name: "Soul Knight", chance: 35, rarity: "common", income: 0.03 },
@@ -584,6 +571,7 @@
             big: {
                 price: 50,
                 size: { min: 4, max: 6 },
+                diamondChance: 1, // 1% шанс получить алмаз
                 cards: [
                     { name: "Baldi's Basic Classics", chance: 40, rarity: "rare", income: 0.07 },
                     { name: "Roblox", chance: 30, rarity: "rare", income: 0.1 },
@@ -595,6 +583,7 @@
             premium: {
                 price: 500,
                 size: { min: 4, max: 6 },
+                diamondChance: 1, // 1% шанс получить алмаз
                 cards: [
                     { name: "Bandi", chance: 50, rarity: "epic", income: 1.2 },
                     { name: "Terraria", chance: 30, rarity: "epic", income: 2 },
@@ -607,6 +596,7 @@
             ultra: {
                 price: 50000,
                 size: { min: 5, max: 7 },
+                diamondChance: 5, // 5% шанс получить алмаз
                 cards: [
                     { name: "ULTRAKILL", chance: 40, rarity: "legendary", income: 3.25 },
                     { name: "Nothing", chance: 20, rarity: "legendary", income: 3.75 },
@@ -621,6 +611,7 @@
             omega: {
                 price: 4000000,
                 size: { min: 2, max: 5 },
+                diamondChance: 5, // 5% шанс получить алмаз
                 cards: [
                     { name: "GeometryDash", chance: 70, rarity: "legendary", income: 7 },
                     { name: "Genshin", chance: 25, rarity: "mythic", income: 20 },
@@ -631,6 +622,7 @@
             ruby: {
                 price: 45000000,
                 size: { min: 4, max: 7 },
+                diamondChance: 5, // 5% шанс получить алмаз
                 cards: [
                     { name: "stickman War", chance: 60, rarity: "mythic", income: 17.5 },
                     { name: "Genshin", chance: 35, rarity: "mythic", income: 20 },
@@ -641,6 +633,7 @@
             ppp: {
                 price: 1000000000,
                 size: { min: 1, max: 10 },
+                diamondChance: 5, // 5% шанс получить алмаз
                 cards: [
                     { name: "MINECRAFT", chance: 50, rarity: "divine", income: 100 },
                     { name: "PACKMAN", chance: 35, rarity: "divine", income: 200 },
@@ -651,58 +644,6 @@
                 ]
             }
         };
-        
-        // Квесты
-        const quests = [
-            {
-                id: 1,
-                name: "Открыть 5 маленьких пачек",
-                description: "Откройте 5 маленьких пачек карт",
-                condition: (state) => state.smallPacksOpened >= 5,
-                progress: (state) => `Прогресс: ${state.smallPacksOpened}/5`,
-                reward: { diamonds: 5 }
-            },
-            {
-                id: 2,
-                name: "Открыть 3 больших пачки",
-                description: "Откройте 3 больших пачки карт",
-                condition: (state) => state.bigPacksOpened >= 3,
-                progress: (state) => `Прогресс: ${state.bigPacksOpened}/3`,
-                reward: { diamonds: 6 }
-            },
-            {
-                id: 3,
-                name: "Открыть 2 ультра пачки",
-                description: "Откройте 2 ультра пачки карт",
-                condition: (state) => state.ultraPacksOpened >= 2,
-                progress: (state) => `Прогресс: ${state.ultraPacksOpened}/2`,
-                reward: { diamonds: 10 }
-            },
-            {
-                id: 4,
-                name: "Прокачать 5 слотов",
-                description: "Увеличьте количество слотов 5 раз",
-                condition: (state) => state.slotsUpgraded >= 5,
-                progress: (state) => `Прогресс: ${state.slotsUpgraded}/5`,
-                reward: { diamonds: 7 }
-            },
-            {
-                id: 5,
-                name: "Добавить 3 блока",
-                description: "Увеличьте количество блоков 3 раза",
-                condition: (state) => state.blocksUpgraded >= 3,
-                progress: (state) => `Прогресс: ${state.blocksUpgraded}/3`,
-                reward: { diamonds: 10 }
-            },
-            {
-                id: 6,
-                name: "Найти редкую карту",
-                description: "Выбить карту с шансом менее 1%",
-                condition: (state) => state.rareCardsFound >= 1,
-                progress: (state) => `Прогресс: ${state.rareCardsFound}/1`,
-                reward: { diamonds: 15 }
-            }
-        ];
         
         // События
         const events = [
@@ -796,7 +737,6 @@
             
             setInterval(passiveIncome, 1000);
             setInterval(saveGame, 30000);
-            setInterval(updateQuestTimer, 1000);
             setInterval(checkForRandomEvent, 60000);
             
             window.addEventListener('beforeunload', saveGame);
@@ -836,10 +776,6 @@
                     gameState.blocksUpgraded = parsed.blocksUpgraded || gameState.blocksUpgraded;
                     gameState.rareCardsFound = parsed.rareCardsFound || gameState.rareCardsFound;
                     gameState.mutations = parsed.mutations || gameState.mutations;
-                    gameState.currentQuest = parsed.currentQuest || gameState.currentQuest;
-                    gameState.questCompleted = parsed.questCompleted || gameState.questCompleted;
-                    gameState.questTimer = parsed.questTimer || gameState.questTimer;
-                    gameState.lastQuestUpdate = parsed.lastQuestUpdate || Date.now();
                     
                     // Восстанавливаем время последнего сохранения
                     if (parsed.lastPlayTime) {
@@ -894,8 +830,6 @@
             document.getElementById('omega-pack').disabled = gameState.money < packs.omega.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('ruby-pack').disabled = gameState.money < packs.ruby.price || gameState.cards.length >= gameState.maxCards;
             document.getElementById('ppp-pack').disabled = gameState.money < packs.ppp.price || gameState.cards.length >= gameState.maxCards;
-            
-            updateQuestUI();
         }
         
         // Переключение видимости магазина
@@ -1126,7 +1060,7 @@
             renderInventory();
         }
         
-        // Продажа карты
+        // Продажа карта
         function sellCard(index) {
             if (index >= 0 && index < gameState.cards.length) {
                 const card = gameState.cards[index];
@@ -1199,13 +1133,18 @@
             
             gameState.money -= pack.price;
             
+            // Проверяем, получаем ли мы алмаз
+            if (Math.random() * 100 < pack.diamondChance) {
+                gameState.diamonds += 1;
+                showNotification(`Вы получили алмаз при покупке пачки!`, '#00bfff');
+            }
+            
             // Увеличиваем счетчик открытых пачек
             if (packType === 'small') gameState.smallPacksOpened++;
             else if (packType === 'big') gameState.bigPacksOpened++;
             else if (packType === 'ultra') gameState.ultraPacksOpened++;
             
             updateUI();
-            checkQuestCompletion();
             
             // Генерируем случайное количество карт в пачке
             const packSize = Math.floor(Math.random() * (pack.size.max - pack.size.min + 1)) + pack.size.min;
@@ -1255,7 +1194,6 @@
             // Проверяем на редкую карту
             if (card.chance < 1) {
                 gameState.rareCardsFound++;
-                checkQuestCompletion();
             }
             
             // Создаем элементы карты
@@ -1353,7 +1291,6 @@
             gameState.placedCards.push(null);
             gameState.blockPrice = Math.floor(gameState.blockPrice * 1.5);
             
-            checkQuestCompletion();
             updateUI();
             renderBlocks();
             saveGame();
@@ -1371,7 +1308,6 @@
             gameState.slotsUpgraded++;
             gameState.slotPrice = Math.floor(gameState.slotPrice * 1.05);
             
-            checkQuestCompletion();
             updateUI();
             saveGame();
         }
@@ -1389,138 +1325,6 @@
                 updateUI();
                 saveGame();
             }
-        }
-        
-        // Обновление таймера квестов
-        function updateQuestTimer() {
-            const now = Date.now();
-            const delta = now - gameState.lastQuestUpdate;
-            gameState.lastQuestUpdate = now;
-            
-            // Если есть активный незавершенный квест - не обновляем таймер
-            if (gameState.currentQuest && !gameState.questCompleted) {
-                return;
-            }
-            
-            // Уменьшаем таймер только если нет активного квеста
-            if (gameState.questTimer > 0) {
-                gameState.questTimer -= Math.floor(delta / 1000);
-                
-                if (gameState.questTimer < 0) {
-                    gameState.questTimer = 0;
-                }
-                
-                const minutes = Math.floor(gameState.questTimer / 60);
-                const seconds = gameState.questTimer % 60;
-                
-                document.getElementById('quest-timer').textContent = 
-                    `До нового квеста: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-            }
-            
-            // Если таймер истек - разрешаем взять новый квест
-            if (gameState.questTimer <= 0) {
-                document.getElementById('get-quest-btn').disabled = false;
-                document.getElementById('quest-timer').textContent = 'Можно взять новый квест';
-            }
-            
-            saveGame();
-        }
-        
-        // Обработчик кнопки квеста
-        function handleQuestButton() {
-            if (gameState.currentQuest && gameState.questCompleted) {
-                completeQuest();
-            } else {
-                getNewQuest();
-            }
-        }
-        
-        // Получение нового квеста
-        function getNewQuest() {
-            // Проверяем, можно ли взять новый квест
-            if (gameState.currentQuest && !gameState.questCompleted) {
-                alert('Сначала завершите текущий квест!');
-                return;
-            }
-            
-            if (gameState.questTimer > 0) {
-                alert('Подождите, пока таймер квеста истечет!');
-                return;
-            }
-            
-            // Выбираем случайный квест
-            const availableQuests = quests.filter(q => {
-                // Исключаем квест "Найти редкую карту", если уже найдена
-                if (q.id === 6 && gameState.rareCardsFound > 0) return false;
-                return true;
-            });
-            
-            const randomIndex = Math.floor(Math.random() * availableQuests.length);
-            const quest = availableQuests[randomIndex];
-            
-            gameState.currentQuest = {...quest};
-            gameState.questCompleted = false;
-            gameState.questTimer = 120; // Сбрасываем таймер
-            
-            document.getElementById('get-quest-btn').disabled = true;
-            updateQuestUI();
-            saveGame();
-        }
-        
-        // Обновление интерфейса квеста
-        function updateQuestUI() {
-            const questElement = document.getElementById('current-quest');
-            
-            if (gameState.currentQuest) {
-                const progress = gameState.currentQuest.progress(gameState);
-                questElement.innerHTML = `
-                    <strong>${gameState.currentQuest.name}</strong><br>
-                    ${gameState.currentQuest.description}<br>
-                    ${progress}
-                    ${gameState.questCompleted ? '<br><strong>Готово! Нажмите "Взять квест" для награды</strong>' : ''}
-                `;
-                
-                document.getElementById('get-quest-btn').textContent = 
-                    gameState.questCompleted ? 'Получить награду' : 'Взять квест у Джона';
-            } else {
-                questElement.textContent = 'Нет активного квеста';
-                document.getElementById('get-quest-btn').textContent = 'Взять квест у Джона';
-            }
-        }
-        
-        // Проверка выполнения квеста
-        function checkQuestCompletion() {
-            if (!gameState.currentQuest || gameState.questCompleted) return;
-            
-            if (gameState.currentQuest.condition(gameState)) {
-                gameState.questCompleted = true;
-                updateQuestUI();
-                saveGame();
-                
-                // Показываем уведомление о выполнении квеста
-                showNotification(`Квест "${gameState.currentQuest.name}" выполнен! Нажмите "Взять квест" для получения награды.`);
-            }
-        }
-        
-        // Завершение квеста и получение награды
-        function completeQuest() {
-            if (!gameState.currentQuest || !gameState.questCompleted) {
-                alert('Нет выполненного квеста!');
-                return;
-            }
-            
-            const reward = gameState.currentQuest.reward;
-            gameState.diamonds += reward.diamonds;
-            
-            showNotification(`Квест выполнен! Получено ${reward.diamonds} алмазов`);
-            
-            // Сбрасываем квест
-            gameState.currentQuest = null;
-            gameState.questCompleted = false;
-            gameState.questTimer = 120;
-            
-            updateUI();
-            saveGame();
         }
         
         // Покупка мутации
@@ -1597,7 +1401,6 @@
             
             showNotification(`Улучшение "${upgradeName}" приобретено!`);
             
-            checkQuestCompletion();
             updateUI();
             renderBlocks();
             saveGame();
